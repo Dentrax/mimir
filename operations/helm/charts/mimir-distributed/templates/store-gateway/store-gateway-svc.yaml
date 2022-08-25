@@ -6,9 +6,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "mimir.zonedResourceName" $args }}
+  name: {{ include "mimir.resourceName" $args }}
   labels:
-    {{- include "mimir.zonedLabels" $args | nindent 4 }}
+    {{- include "mimir.labels" $args | nindent 4 }}
     {{- with .Values.store_gateway.service.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -27,7 +27,7 @@ spec:
       name: grpc
       targetPort: grpc
   selector:
-    {{- include "mimir.zonedSelectorLabels" $args | nindent 4 }}
+    {{- include "mimir.selectorLabels" $args | nindent 4 }}
 
 ---
 {{ end }}

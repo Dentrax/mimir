@@ -172,37 +172,24 @@ Memberlist bind port
 Resource name template
 Params:
   ctx = . context
-  component = component name
+  component = component name (optional)
+  rolloutZoneName = rollout zone name (optional)
 */}}
 {{- define "mimir.resourceName" -}}
-{{ include "mimir.fullname" .ctx }}{{- if .component -}}-{{ .component }}{{- end -}}
+{{- $resourceName := include "mimir.fullname" .ctx -}}
+{{- if .component -}}{{- $resourceName = printf "%s-%s" $resourceName .component -}}{{- end -}}
+{{- if and (not .component) .rolloutZoneName -}}{{- printf "Component name cannot be empty if rolloutZoneName (%s) is set" .rolloutZoneName | fail -}}{{- end -}}
+{{- if .rolloutZoneName -}}{{- $resourceName = printf "%s-%s" $resourceName .rolloutZoneName -}}{{- end -}}
+{{- if gt (len $resourceName) 253 -}}{{- printf "Resource name (%s) exceeds kubernetes limit of 253 character." $resourceName | fail -}}{{- end -}}
+{{- $resourceName -}}
 {{- end -}}
 
 {{/*
-Zone aware resource name template
+Resource labels
 Params:
   ctx = . context
-  component = component name
-  rolloutZoneName = rollout zone name
-*/}}
-{{- define "mimir.zonedResourceName" -}}
-{{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml -}}
-{{- if $componentSection.zone_aware_replication.enabled -}}
-{{-   $zoneNameCharLimit := sub 64 (len (printf "%s-" .component)) -}}
-{{-   if gt (len .rolloutZoneName) $zoneNameCharLimit -}}
-{{-     fail (printf "Zone Name (%s) exceeds character limit (%d)" .rolloutZoneName $zoneNameCharLimit ) -}}
-{{-   end -}}
-{{-   include "mimir.resourceName" . -}}-{{- .rolloutZoneName -}}
-{{- else -}}
-{{-   include "mimir.resourceName" . -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Simple resource labels
-Params:
-  ctx = . context
-  component = component name
+  component = component name (optional)
+  rolloutZoneName = rollout zone name (optional)
 */}}
 {{- define "mimir.labels" -}}
 {{- if .ctx.Values.enterprise.legacyLabels }}
@@ -231,23 +218,14 @@ app.kubernetes.io/version: {{ .ctx.Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .ctx.Release.Service }}
 {{- end }}
-{{- end -}}
-
-{{/*
-Zone aware labels
-Params:
-  ctx = . context
-  component = component name
-  rolloutZoneName = rollout zone name
-*/}}
-{{- define "mimir.zonedLabels" -}}
-{{  include "mimir.labels" . }}
-{{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml }}
-{{- if $componentSection.zone_aware_replication.enabled }}
+{{- if .rolloutZoneName }}
+{{-   if not .component }}
+{{-     printf "Component name cannot be empty if rolloutZoneName (%s) is set" .rolloutZoneName | fail }}
+{{-   end }}
 name: "{{ .component }}-{{ .rolloutZoneName }}" {{- /* Currently required for rollout-operator. https://github.com/grafana/rollout-operator/issues/15 */}}
 rollout-group: {{ .component }}
 zone: {{ .rolloutZoneName }}
-{{- end -}}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -287,23 +265,14 @@ app.kubernetes.io/part-of: memberlist
 {{- with ($componentSection).podLabels }}
 {{ toYaml . }}
 {{- end }}
-{{- end -}}
-
-{{/*
-Zone aware POD labels
-Params:
-  ctx = . context
-  component = component name
-  rolloutZoneName = rollout zone name
-*/}}
-{{- define "mimir.zonedPodLabels" -}}
-{{ include "mimir.podLabels" . }}
-{{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml }}
-{{- if $componentSection.zone_aware_replication.enabled }}
+{{- if .rolloutZoneName }}
+{{-   if not .component }}
+{{-     printf "Component name cannot be empty if rolloutZoneName (%s) is set" .rolloutZoneName | fail }}
+{{-   end }}
 name: "{{ .component }}-{{ .rolloutZoneName }}" {{- /* Currently required for rollout-operator. https://github.com/grafana/rollout-operator/issues/15 */}}
 rollout-group: {{ .component }}
 zone: {{ .rolloutZoneName }}
-{{- end -}}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -330,7 +299,7 @@ checksum/config: {{ include (print .ctx.Template.BasePath "/mimir-config.yaml") 
 {{- end -}}
 
 {{/*
-Simple service selector labels
+Service selector labels
 Params:
   ctx = . context
   component = name of the component
@@ -348,22 +317,13 @@ app.kubernetes.io/instance: {{ .ctx.Release.Name }}
 app.kubernetes.io/component: {{ .component }}
 {{- end }}
 {{- end -}}
-{{- end -}}
-
-{{/*
-Zone aware selector labels
-Params:
-  ctx = . context
-  component = component name
-  rolloutZoneName = rollout zone name
-*/}}
-{{- define "mimir.zonedSelectorLabels" -}}
-{{ include "mimir.selectorLabels" . }}
-{{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml }}
-{{- if $componentSection.zone_aware_replication.enabled }}
+{{- if .rolloutZoneName }}
+{{-   if not .component }}
+{{-     printf "Component name cannot be empty if rolloutZoneName (%s) is set" .rolloutZoneName | fail }}
+{{-   end }}
 rollout-group: {{ .component }}
 zone: {{ .rolloutZoneName }}
-{{- end -}}
+{{- end }}
 {{- end -}}
 
 
@@ -497,7 +457,7 @@ Params:
 {{- fail "When zone awareness is enabled, you must have at least 3 zones defined." -}}
 {{- end -}}
 {{- else -}}
-{{- merge $zonesMap (dict "default" (dict "affinity" $componentSection.affinity "nodeSelector" $componentSection.nodeSelector)) -}}
+{{- $_ := set $zonesMap "" (dict "affinity" $componentSection.affinity "nodeSelector" $componentSection.nodeSelector) -}}
 {{- end -}}
 {{- $zonesMap | toYaml }}
 {{- end -}}
@@ -507,10 +467,11 @@ Calculate annotations with zone awareness
 Params:
   ctx = . context
   component = component name
+  rolloutZoneName = rollout zone name (optional)
 */}}
 {{- define "mimir.componentAnnotations" -}}
 {{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml -}}
-{{- if $componentSection.zone_aware_replication.enabled }}
+{{- if and $componentSection.zone_aware_replication.enabled .rolloutZoneName }}
 {{- $map := dict "rollout-max-unavailable" ($componentSection.zone_aware_replication.max_unavailable | toString) -}}
 {{- toYaml (deepCopy $map | mergeOverwrite $componentSection.annotations) }}
 {{- else -}}

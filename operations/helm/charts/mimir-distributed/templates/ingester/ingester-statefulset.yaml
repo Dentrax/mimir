@@ -6,9 +6,9 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "mimir.zonedResourceName" $args }}
+  name: {{ include "mimir.resourceName" $args }}
   labels:
-    {{- include "mimir.zonedLabels" $args | nindent 4 }}
+    {{- include "mimir.labels" $args | nindent 4 }}
   annotations:
     {{- include "mimir.componentAnnotations" $args | nindent 4 }}
   namespace: {{ .Release.Namespace | quote }}
@@ -17,9 +17,9 @@ spec:
   replicas: {{ .Values.ingester.replicas }}
   selector:
     matchLabels:
-      {{- include "mimir.zonedSelectorLabels" $args | nindent 6 }}
+      {{- include "mimir.selectorLabels" $args | nindent 6 }}
   updateStrategy:
-    {{- if .Values.ingester.zone_aware_replication.enabled }}
+    {{- if $zoneName }}
     type: OnDelete
     {{- else }}
     {{- toYaml .Values.ingester.statefulStrategy | nindent 4 }}
@@ -50,7 +50,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "mimir.zonedPodLabels" $args | nindent 8 }}
+        {{- include "mimir.podLabels" $args | nindent 8 }}
       annotations:
         {{- include "mimir.podAnnotations" $args | nindent 8 }}
       namespace: {{ .Release.Namespace | quote }}
@@ -107,7 +107,7 @@ spec:
             - "-target=ingester"
             - "-config.expand-env=true"
             - "-config.file=/etc/mimir/mimir.yaml"
-            {{- if .Values.ingester.zone_aware_replication.enabled }}
+            {{- if $zoneName }}
             - "-ingester.ring.instance-availability-zone={{ $zoneName }}"
             {{- else }}
             - "-ingester.ring.instance-availability-zone=zone-default"

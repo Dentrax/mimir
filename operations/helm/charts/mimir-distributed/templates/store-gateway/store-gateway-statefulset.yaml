@@ -6,9 +6,9 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "mimir.zonedResourceName" $args }}
+  name: {{ include "mimir.resourceName" $args }}
   labels:
-    {{- include "mimir.zonedLabels" $args | nindent 4 }}
+    {{- include "mimir.labels" $args | nindent 4 }}
   annotations:
     {{- include "mimir.componentAnnotations" $args | nindent 4 }}
   namespace: {{ .Release.Namespace | quote }}
@@ -16,9 +16,9 @@ spec:
   replicas: {{ .Values.store_gateway.replicas }}
   selector:
     matchLabels:
-      {{- include "mimir.zonedSelectorLabels" $args | nindent 6 }}
+      {{- include "mimir.selectorLabels" $args | nindent 6 }}
   updateStrategy:
-    {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+    {{- if $zoneName }}
     type: OnDelete
     {{- else }}
     {{- toYaml .Values.store_gateway.strategy | nindent 4 }}
@@ -49,7 +49,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "mimir.zonedPodLabels" $args | nindent 8 }}
+        {{- include "mimir.podLabels" $args | nindent 8 }}
       annotations:
         {{- include "mimir.podAnnotations" $args | nindent 8 }}
       namespace: {{ .Release.Namespace | quote }}
@@ -106,7 +106,7 @@ spec:
             - "-target=store-gateway"
             - "-config.expand-env=true"
             - "-config.file=/etc/mimir/mimir.yaml"
-            {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+            {{- if $zoneName }}
             - "-store-gateway.sharding-ring.instance-availability-zone={{ $zoneName }}"
             {{- end }}
             {{- range $key, $value := .Values.store_gateway.extraArgs }}
