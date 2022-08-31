@@ -157,7 +157,7 @@ func TestRuler(t *testing.T) {
 
 			rulerAddrMap := map[string]*Ruler{}
 
-			r := buildRuler(t, cfg, newMockRuleStore(tc.mockRules), rulerAddrMap)
+			r := buildRuler(t, cfg, newMockRuleStore(tc.mockRules), rulerAddrMap, nil)
 			require.NoError(t, services.StartAndAwaitRunning(context.Background(), r))
 			defer services.StopAndAwaitTerminated(context.Background(), r) //nolint:errcheck
 
@@ -197,7 +197,7 @@ func TestRuler_alerts(t *testing.T) {
 
 	rulerAddrMap := map[string]*Ruler{}
 
-	r := buildRuler(t, cfg, newMockRuleStore(mockRules), rulerAddrMap)
+	r := buildRuler(t, cfg, newMockRuleStore(mockRules), rulerAddrMap, nil)
 	require.NoError(t, services.StartAndAwaitRunning(context.Background(), r))
 	defer services.StopAndAwaitTerminated(context.Background(), r) //nolint:errcheck
 
@@ -238,7 +238,7 @@ func TestRuler_alerts(t *testing.T) {
 func TestRuler_Create(t *testing.T) {
 	cfg := defaultRulerConfig(t)
 
-	r := newTestRuler(t, cfg, newMockRuleStore(make(map[string]rulespb.RuleGroupList)))
+	r := newTestRuler(t, cfg, newMockRuleStore(make(map[string]rulespb.RuleGroupList)), nil)
 	defer services.StopAndAwaitTerminated(context.Background(), r) //nolint:errcheck
 
 	a := NewAPI(r, r.store, log.NewNopLogger())
@@ -366,7 +366,7 @@ func TestRuler_DeleteNamespace(t *testing.T) {
 		},
 	}
 
-	r := newTestRuler(t, cfg, newMockRuleStore(mockRulesNamespaces))
+	r := newTestRuler(t, cfg, newMockRuleStore(mockRulesNamespaces), nil)
 	defer services.StopAndAwaitTerminated(context.Background(), r) //nolint:errcheck
 
 	a := NewAPI(r, r.store, log.NewNopLogger())
@@ -403,7 +403,7 @@ func TestRuler_DeleteNamespace(t *testing.T) {
 func TestRuler_LimitsPerGroup(t *testing.T) {
 	cfg := defaultRulerConfig(t)
 
-	r := newTestRuler(t, cfg, newMockRuleStore(make(map[string]rulespb.RuleGroupList)))
+	r := newTestRuler(t, cfg, newMockRuleStore(make(map[string]rulespb.RuleGroupList)), nil)
 	defer services.StopAndAwaitTerminated(context.Background(), r) //nolint:errcheck
 
 	r.limits = &ruleLimits{maxRuleGroups: 1, maxRulesPerRuleGroup: 1}
@@ -456,7 +456,7 @@ rules:
 func TestRuler_RulerGroupLimits(t *testing.T) {
 	cfg := defaultRulerConfig(t)
 
-	r := newTestRuler(t, cfg, newMockRuleStore(make(map[string]rulespb.RuleGroupList)))
+	r := newTestRuler(t, cfg, newMockRuleStore(make(map[string]rulespb.RuleGroupList)), nil)
 	defer services.StopAndAwaitTerminated(context.Background(), r) //nolint:errcheck
 
 	r.limits = &ruleLimits{maxRuleGroups: 1, maxRulesPerRuleGroup: 1}

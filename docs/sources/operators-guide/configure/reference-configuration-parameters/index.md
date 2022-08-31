@@ -2529,6 +2529,11 @@ The `limits` block configures default and per-tenant limits imposed by component
 # CLI flag: -ruler.max-rule-groups-per-tenant
 [ruler_max_rule_groups_per_tenant: <int> | default = 70]
 
+# (advanced) Maximum number of alerts/series each rule can generate. 0 to
+# disable.
+# CLI flag: -ruler.max-results-per-rule
+[ruler_max_results_per_rule: <int> | default = 10000]
+
 # The tenant's shard size, used when store-gateway sharding is enabled. Value of
 # 0 disables shuffle sharding for the tenant, that is all tenant blocks are
 # sharded across all store-gateway replicas.
