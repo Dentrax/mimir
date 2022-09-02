@@ -19,7 +19,6 @@ compactor:
     enabled: false
 
 ingester:
-  replicas: 1
   resources:
     <<: *ci_resources
   persistentVolume:

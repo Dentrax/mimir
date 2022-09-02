@@ -15,7 +15,7 @@ metadata:
     {{- include "mimir.componentAnnotations" $args | nindent 4 }}
   namespace: {{ .Release.Namespace | quote }}
 spec:
-  replicas: {{ .Values.alertmanager.replicas }}
+  replicas: {{ $rolloutZone.replicas }}
   selector:
     matchLabels:
       {{- include "mimir.selectorLabels" $args | nindent 6 }}

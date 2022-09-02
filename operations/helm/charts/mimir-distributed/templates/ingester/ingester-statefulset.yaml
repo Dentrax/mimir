@@ -14,7 +14,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
 spec:
   podManagementPolicy: {{ .Values.ingester.podManagementPolicy }}
-  replicas: {{ .Values.ingester.replicas }}
+  replicas: {{ $rolloutZone.replicas }}
   selector:
     matchLabels:
       {{- include "mimir.selectorLabels" $args | nindent 6 }}

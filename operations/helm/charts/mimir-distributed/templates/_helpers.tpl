@@ -450,14 +450,20 @@ Params:
 {{- $zonesMap := (dict) -}}
 {{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml -}}
 {{- if $componentSection.zone_aware_replication.enabled -}}
-{{- range $idx, $rolloutZone := $componentSection.zone_aware_replication.zones -}}
-{{- $_ := set $zonesMap $rolloutZone.name (dict "affinity" ($rolloutZone.affinity | default (dict)) "nodeSelector" ($rolloutZone.nodeSelector | default (dict) ) ) -}}
-{{- end -}}
-{{- if lt (len $zonesMap) 3 -}}
+{{- $numberOfZones := len $componentSection.zone_aware_replication.zones -}}
+{{- if lt $numberOfZones 3 -}}
 {{- fail "When zone awareness is enabled, you must have at least 3 zones defined." -}}
 {{- end -}}
+{{- $replicaPerZone := div (add $componentSection.replicas $numberOfZones -1) $numberOfZones -}}
+{{- range $idx, $rolloutZone := $componentSection.zone_aware_replication.zones -}}
+{{- $_ := set $zonesMap $rolloutZone.name (dict
+  "affinity" ($rolloutZone.affinity | default (dict))
+  "nodeSelector" ($rolloutZone.nodeSelector | default (dict) )
+  "replicas" $replicaPerZone
+  ) -}}
+{{- end -}}
 {{- else -}}
-{{- $_ := set $zonesMap "" (dict "affinity" $componentSection.affinity "nodeSelector" $componentSection.nodeSelector) -}}
+{{- $_ := set $zonesMap "" (dict "affinity" $componentSection.affinity "nodeSelector" $componentSection.nodeSelector "replicas" $componentSection.replicas) -}}
 {{- end -}}
 {{- $zonesMap | toYaml }}
 {{- end -}}
