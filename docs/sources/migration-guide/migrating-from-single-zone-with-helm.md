@@ -43,63 +43,63 @@ There are two use cases in general:
 
 1. Speeding up rollout of ingesters. In this case the default value for `ingester.zone_aware_replication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node.
 1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
-    ```yaml
-    ingester:
-      zone_aware_replication:
-        enabled: false  # Do not turn on zone awareness without migration because of data loss
-        zones:
-        - name: zone-a
-          nodeSelector:
-            topology.kubernetes.io/zone: zone-a
-          affinity:
-            podAntiAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                    - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                    - store-gateway-zone-a
-                topologyKey: 'kubernetes.io/hostname'
-        - name: zone-b
-          nodeSelector:
-            topology.kubernetes.io/zone: zone-b
-          affinity:
-            podAntiAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                    - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                    - store-gateway-zone-b
-                topologyKey: 'kubernetes.io/hostname'
-        - name: zone-c
-          nodeSelector:
-            topology.kubernetes.io/zone: zone-c
-          affinity:
-            podAntiAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                    - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                    - store-gateway-zone-c
-                topologyKey: 'kubernetes.io/hostname'
-    ```
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: false # Do not turn on zone awareness without migration because of data loss
+       zones:
+         - name: zone-a
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-a
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - store-gateway
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - store-gateway-zone-a
+                   topologyKey: "kubernetes.io/hostname"
+         - name: zone-b
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-b
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - store-gateway
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - store-gateway-zone-b
+                   topologyKey: "kubernetes.io/hostname"
+         - name: zone-c
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-c
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - store-gateway
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - store-gateway-zone-c
+                   topologyKey: "kubernetes.io/hostname"
+   ```
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
@@ -217,7 +217,7 @@ There are two ways to do the migration:
 
 1. Enable writes to the installation
 
-   __Merge__ the following values into your regular `custom.yaml` file:
+   **Merge** the following values into your regular `custom.yaml` file:
 
    ```yaml
    ingester:
