@@ -145,5 +145,29 @@
 {{- end }}
 
 {{- if not .Values.ingester.statefulSet.enabled -}}
-{{- fail "You have set ingester.statefulSet.enabled: false. Ingesters are stateful, kubernetes Deployment workloads are no longer supported. Please refer to the documentation for more details." }}
+{{- fail "You have set ingester.statefulSet.enabled=false. Ingesters are stateful, kubernetes Deployment workloads are no longer supported. Please refer to the documentation for more details." }}
+{{- end -}}
+
+{{- if and .Values.ingester.zone_aware_replication.enabled (not ((($calculatedConfig).ingester).ring).zone_awareness_enabled) -}}
+{{- fail "You have set ingester.zone_aware_replication.enabled=true. The mimir.config must include ingester.ring.zone_awareness_enabled=true. Please merge the latest mimir.config from the chart with your mimir.config."}}
+{{- end -}}
+
+{{- if and .Values.ingester.zone_aware_replication.migration.enabled (not .Values.ingester.zone_aware_replication.enabled) -}}
+{{- fail "You have set ingester.zone_aware_replication.migration.enabled=true, but ingester.zone_aware_replication.enabled=false. Please consult the Migrating from single zone with Helm document."}}
+{{- end -}}
+
+{{- with $.Values.ingester.zone_aware_replication.migration }}
+{{- if and .replicas (not .enabled) }}
+{{- fail "You have set ingester.zone_aware_replication.migration.replicas, but ingester.zone_aware_replication.migration.enabled=false. Please consult the Migrating from single zone with Helm document."}}
+{{- end -}}
+{{- $steps := list "enabled" "write_path" "read_path" "exclude_default_zone" "scale_down_default_zone" }}
+{{- range $i, $item := rest $steps -}}
+{{- range $j, $mustHave := slice $steps 0 $i }}
+{{- with $.Values.ingester.zone_aware_replication.migration }}
+{{- if and (index . $item) (not (index . $mustHave)) -}}
+{{- printf "You have set ingester.zone_aware_replication.migration.%s=true, but ingester.zone_aware_replication.migration.%s=false. Please consult the Migrating from single zone with Helm document." $item $mustHave | fail }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}

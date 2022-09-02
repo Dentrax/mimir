@@ -43,6 +43,11 @@ spec:
             - "-target=querier"
             - "-config.expand-env=true"
             - "-config.file=/etc/mimir/mimir.yaml"
+          {{- if .Values.ingester.zone_aware_replication.migration.enabled }}
+            {{- if not .Values.ingester.zone_aware_replication.migration.read_path }}
+            - "-ingester.ring.zone-awareness-enabled=false"
+            {{- end }}
+          {{- end }}
           {{- range $key, $value := .Values.querier.extraArgs }}
             - "-{{ $key }}={{ $value }}"
           {{- end }}

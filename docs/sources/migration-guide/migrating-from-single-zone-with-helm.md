@@ -117,8 +117,8 @@ ingester:
 
 There are two ways to do the migration:
 
-1. With downtime. In this procedure ingress is stopped to the cluster while ingesters are migrated. This is the quicker and simpler way.
-1. Without downtime. This is a multi step process which requires additional hardware resources as the old and new ingesters run in parallel for some time. This is a complex migration.
+1. With downtime. In this [procedure](#migrate-ingesters-with-downtime) ingress is stopped to the cluster while ingesters are migrated. This is the quicker and simpler way.
+1. Without downtime. This is a multi step [procedure](#migrate-ingesters-without-downtime) which requires additional hardware resources as the old and new ingesters run in parallel for some time. This is a complex migration that can take days.
 
 ### Migrate ingesters with downtime
 
@@ -229,5 +229,209 @@ There are two ways to do the migration:
    ```
 
    > **Note**: these values are actually the default, which means that removing the values `ingester.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+
+1. Upgrade the installation with the `helm` command using only your regular command line flags.
+
+### Migrate ingesters without downtime
+
+1. Create a new empty YAML file called `migrate.yaml`
+
+1. Start the migration.
+
+   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters)
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         replicas: 0
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+   In this step new zone aware statefulsets are created - but no new pods are started yet. The parameter `ingester.ring.zone_awareness_enabled: true` is set in the Mimir configuration via the `mimir.config` value. The flag `-ingester.ring.zone-awareness-enabled=false` is set on distributors, rulers and queriers. The flags `-blocks-storage.tsdb.flush-blocks-on-shutdown` and `-ingester.ring.unregister-on-shutdown` are set to true for the ingesters.
+
+1. Wait for all Mimir components to restart.
+
+1. Progressively scale zone-aware ingesters up, maximum 21 at a time.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         replicas: <N>
+
+   rollout_operator:
+     enabled: true
+   ```
+
+   > **Note**: replace `<N>` with the number of replicas in each step until `<N>` reaches the same number as in `ingester.replicas`, do not increase `<N>` with more than 21 in each step.
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Once the new ingesters are started, wait at least 3 hours.
+
+   The 3 hours is calculated from `blocks_storage.tsdb.block_ranges_period` + `blocks_storage.tsdb.head_compaction_idle_timeout` Grafana Mimir parameters to give enough time for ingesters to remove stale series from memory. Stale series will be there due to series being moved between ingesters.
+
+1. If the current `<N>` above in `ingester.zone_aware_replication.migration.replicas` is less than `ingester.replicas`, go back to step 8.
+
+1. Enable zone awareness on the write path.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         write_path: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+   In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from distributors, rulers.
+
+1. Once all distributors and rulers have restarted, wait 12 hours.
+
+   The 12 hours is calculated from the `querier.query_store_after` Grafana Mimir parameter.
+
+1. Enable zone awareness on the read path.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         write_path: true
+         read_path: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+   In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from queriers.
+
+1. Wait until all queriers have restarted.
+
+1. Exclude non zone aware ingesters from the write path.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         write_path: true
+         read_path: true
+         exclude_default_zone: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+   In this step the flag `-distributor.excluded-zones=zone-default` is added to distributors and rulers.
+
+1. Wait until all distributors and rulers have restarted.
+
+1. Scale down non zone aware ingesters to 0.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         write_path: true
+         read_path: true
+         exclude_default_zone: true
+         scale_down_default_zone: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until all non zone aware ingesters are terminated.
+
+1. Delete the default zone.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until all old ingesters have terminated.
+
+1. Set the final configuration.
+
+   **Merge** the last values in `migrate.yaml` into your regular `custom.yaml` file:
+
+   ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+   These values are actually the default, which means that removing the values `ingester.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+
+   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
+
+   ```yaml
+   ingester:
+      ring:
+        ...
+        unregister_on_shutdown: false
+        {{- if .Values.ingester.zone_aware_replication.enabled }}
+        zone_awareness_enabled: true
+        {{- end }}
+   ```
+
+   If in doubt, set the following value:
+
+   ```yaml
+   mimir:
+     structuredConfig:
+       ingester:
+         ring:
+           zone_awareness_enabled: true
+   ```
 
 1. Upgrade the installation with the `helm` command using only your regular command line flags.

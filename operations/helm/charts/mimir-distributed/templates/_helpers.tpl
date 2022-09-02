@@ -449,12 +449,17 @@ Params:
 {{- define "mimir.zoneAwareReplicationMap" -}}
 {{- $zonesMap := (dict) -}}
 {{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml -}}
+{{- $defaultZone := (dict "affinity" $componentSection.affinity "nodeSelector" $componentSection.nodeSelector "replicas" $componentSection.replicas) -}}
+
 {{- if $componentSection.zone_aware_replication.enabled -}}
 {{- $numberOfZones := len $componentSection.zone_aware_replication.zones -}}
 {{- if lt $numberOfZones 3 -}}
 {{- fail "When zone awareness is enabled, you must have at least 3 zones defined." -}}
 {{- end -}}
 {{- $replicaPerZone := div (add $componentSection.replicas $numberOfZones -1) $numberOfZones -}}
+{{- if and $componentSection.zone_aware_replication.migration.enabled (not $componentSection.zone_aware_replication.migration.write_path) -}}
+{{- $replicaPerZone = div (add $componentSection.zone_aware_replication.migration.replicas $numberOfZones -1) $numberOfZones -}}
+{{- end -}}
 {{- range $idx, $rolloutZone := $componentSection.zone_aware_replication.zones -}}
 {{- $_ := set $zonesMap $rolloutZone.name (dict
   "affinity" ($rolloutZone.affinity | default (dict))
@@ -462,10 +467,18 @@ Params:
   "replicas" $replicaPerZone
   ) -}}
 {{- end -}}
+{{- if $componentSection.zone_aware_replication.migration.enabled -}}
+{{- if $componentSection.zone_aware_replication.migration.scale_down_default_zone -}}
+{{- $_ := set $defaultZone "replicas" 0 -}}
+{{- end -}}
+{{- $_ := set $zonesMap "" $defaultZone -}}
+{{- end -}}
+
 {{- else -}}
-{{- $_ := set $zonesMap "" (dict "affinity" $componentSection.affinity "nodeSelector" $componentSection.nodeSelector "replicas" $componentSection.replicas) -}}
+{{- $_ := set $zonesMap "" $defaultZone -}}
 {{- end -}}
 {{- $zonesMap | toYaml }}
+
 {{- end -}}
 
 {{/*
@@ -477,7 +490,7 @@ Params:
 */}}
 {{- define "mimir.componentAnnotations" -}}
 {{- $componentSection := include "mimir.componentSectionFromName" . | fromYaml -}}
-{{- if and $componentSection.zone_aware_replication.enabled .rolloutZoneName }}
+{{- if and (or $componentSection.zone_aware_replication.enabled $componentSection.zone_aware_replication.migration.enabled) .rolloutZoneName }}
 {{- $map := dict "rollout-max-unavailable" ($componentSection.zone_aware_replication.max_unavailable | toString) -}}
 {{- toYaml (deepCopy $map | mergeOverwrite $componentSection.annotations) }}
 {{- else -}}

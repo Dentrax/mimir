@@ -111,6 +111,10 @@ spec:
             - "-ingester.ring.instance-availability-zone={{ $zoneName }}"
             {{- else }}
             - "-ingester.ring.instance-availability-zone=zone-default"
+              {{- if .Values.ingester.zone_aware_replication.migration.enabled }}
+            - "-blocks-storage.tsdb.flush-blocks-on-shutdown=true"
+            - "-ingester.ring.unregister-on-shutdown=true"
+              {{- end }}
             {{- end }}
             {{- range $key, $value := .Values.ingester.extraArgs }}
             - "-{{ $key }}={{ $value }}"
