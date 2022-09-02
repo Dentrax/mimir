@@ -716,7 +716,7 @@ ingester:
 
   zone_aware_replication:
     enabled: false
-    max_unavailable: 2
+    max_unavailable: 25
     zones:
     - name: zone-a
       affinity:
@@ -1216,7 +1216,7 @@ store_gateway:
 
   zone_aware_replication:
     enabled: false
-    max_unavailable: 2
+    max_unavailable: 10
     zones:
     - name: zone-a
       affinity:

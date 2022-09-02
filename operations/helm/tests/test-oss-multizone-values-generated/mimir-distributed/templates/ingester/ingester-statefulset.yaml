@@ -14,7 +14,7 @@ metadata:
     rollout-group: ingester
     zone: zone-a
   annotations:
-    rollout-max-unavailable: "2"
+    rollout-max-unavailable: "25"
   namespace: "citestns"
 spec:
   podManagementPolicy: Parallel
@@ -130,7 +130,7 @@ metadata:
     rollout-group: ingester
     zone: zone-b
   annotations:
-    rollout-max-unavailable: "2"
+    rollout-max-unavailable: "25"
   namespace: "citestns"
 spec:
   podManagementPolicy: Parallel
@@ -246,7 +246,7 @@ metadata:
     rollout-group: ingester
     zone: zone-c
   annotations:
-    rollout-max-unavailable: "2"
+    rollout-max-unavailable: "25"
   namespace: "citestns"
 spec:
   podManagementPolicy: Parallel
