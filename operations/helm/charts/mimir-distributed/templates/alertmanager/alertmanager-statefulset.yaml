@@ -1,6 +1,6 @@
 {{- if .Values.alertmanager.enabled -}}
 {{- if .Values.alertmanager.statefulSet.enabled -}}
-{{- $args := dict "ctx" . "component" "alertmanager" "component_config" "alertmanager" "memberlist" true -}}
+{{- $args := dict "ctx" . "component" "alertmanager" "memberlist" true -}}
 {{- $zonesMap := include "mimir.zoneAwareReplicationMap" $args | fromYaml -}}
 {{- range $zoneName, $rolloutZone := $zonesMap }}
 {{- with $ -}}
