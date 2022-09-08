@@ -221,7 +221,9 @@ There are two ways to do the migration:
 
 1. Wait for all new store gateways to start up.
 
-1. Wait for store gateways to sync all blocks (TODO how?)
+1. Wait for store gateways to sync all blocks.
+
+   The logs of the new store gateways should contain the line "successfully synchronized TSDB blocks for all users".
 
 1. Make the read path use the new zone aware store gateways.
 
