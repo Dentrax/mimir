@@ -310,7 +310,6 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
-
 ## Migrate ingesters to zone aware replication
 
 ### Configure zone aware replication for ingesters
@@ -524,7 +523,25 @@ There are two ways to do the migration:
 
 ### Migrate ingesters without downtime
 
-1. Create a new empty YAML file called `migrate.yaml`
+1. Double the series limits for tenants and the ingesters.
+
+   Explanation: while new ingesters are being added, some series will start to be written to new ingesters, however the series will also exist on old ingesters, thus the series will count twice towards limits. Not updating the limits might lead to writes to be refused due to limits violation.
+
+   If you have set the Mimir configuration parameter `ingester.instance_limits.max_series` via `mimir.config` or `mimir.structuredConfig` or via runtime overrides, double it for the duration of the migration.
+
+   If you have set per tenant limits in the Mimir configuration parameters `limits.max_global_series_per_user`, `limits.max_global_series_per_metric` via `mimir.config` or `mimir.sturcturedConfig` or via runtime overrides, double the set limits. For example:
+
+   ```yaml
+   runtimeConfig:
+     ingester_limits:
+       max_series: X # <-- double it
+     overrides:
+       tenantA:
+         max_global_series_per_metric: Y # <-- double it
+         max_global_series_per_user: Z # <-- double it
+   ```
+
+1. Create a new empty YAML file called `migrate.yaml`.
 
 1. Start the migration.
 
@@ -723,5 +740,7 @@ There are two ways to do the migration:
          ring:
            zone_awareness_enabled: true
    ```
+
+1. Undo the doubling of series limits done in the first step.
 
 1. Upgrade the installation with the `helm` command using only your regular command line flags.
