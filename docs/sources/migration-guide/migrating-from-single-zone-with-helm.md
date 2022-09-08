@@ -200,6 +200,115 @@ There are two ways to do the migration:
 
 ### Migrate store gateways without downtime
 
+1. Create a new empty YAML file called `migrate.yaml`.
+
+1. Create the new zone aware store gateways
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait for all new store gateways to start up.
+
+1. Wait for store gateways to sync all blocks (TODO how?)
+
+1. Make the read path use the new zone aware store gateways.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         read_path: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait for the `helm` command to finish.
+
+1. Scale down non zone aware store gateways to 0.
+
+1. Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         read_path: true
+         scale_down_default_zone: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait for non zone aware store gateways to stop.
+
+1. Set the final configuration.
+
+   **Merge** the last values in `migrate.yaml` into your regular `custom.yaml` file:
+
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+   These values are actually the default, which means that removing the values `store_gateway.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+
+   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
+
+   ```yaml
+   store_gateway:
+     sharding_ring:
+       {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+       kvstore:
+         prefix: multi-zone/
+       {{- end }}
+       tokens_file_path: /data/tokens
+       {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+       zone_awareness_enabled: true
+       {{- end }}
+   ```
+
+   If in doubt, set the following values:
+
+   ```yaml
+   mimir:
+     structuredConfig:
+       store_gateway:
+         sharding_ring:
+           kvstore:
+             prefix: multi-zone/
+           zone_awareness_enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command using only your regular command line flags.
+
+
 ## Migrate ingesters to zone aware replication
 
 ### Configure zone aware replication for ingesters

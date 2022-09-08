@@ -301,6 +301,10 @@ mimir:
 
     store_gateway:
       sharding_ring:
+        {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+        kvstore:
+          prefix: multi-zone/
+        {{- end }}
         tokens_file_path: /data/tokens
         {{- if .Values.store_gateway.zone_aware_replication.enabled }}
         zone_awareness_enabled: true
@@ -1259,6 +1263,10 @@ store_gateway:
     migration:
       # -- Indicate if migration is ongoing for multi zone store-gateway
       enabled: false
+      # -- Enable zone awareness on the read_path
+      read_path: false
+      # -- Scale default zone store gateways to 0
+      scale_down_default_zone: false
     # -- Zone definitions for store-gateway zones
     zones:
     - name: zone-a

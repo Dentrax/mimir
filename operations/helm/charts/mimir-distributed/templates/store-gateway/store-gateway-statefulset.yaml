@@ -108,6 +108,11 @@ spec:
             - "-config.file=/etc/mimir/mimir.yaml"
             {{- if $zoneName }}
             - "-store-gateway.sharding-ring.instance-availability-zone={{ $zoneName }}"
+            {{- else }}
+              {{- if .Values.store_gateway.zone_aware_replication.migration.enabled }}
+            - "-store-gateway.sharding-ring.prefix="
+            - "-store-gateway.sharding-ring.zone-awareness-enabled=false"
+              {{- end }}
             {{- end }}
             {{- range $key, $value := .Values.store_gateway.extraArgs }}
             - "-{{ $key }}={{ $value }}"

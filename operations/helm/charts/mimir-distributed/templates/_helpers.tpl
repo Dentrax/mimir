@@ -457,7 +457,7 @@ Params:
 {{- fail "When zone awareness is enabled, you must have at least 3 zones defined." -}}
 {{- end -}}
 {{- $replicaPerZone := div (add $componentSection.replicas $numberOfZones -1) $numberOfZones -}}
-{{- if and $componentSection.zone_aware_replication.migration.enabled (not $componentSection.zone_aware_replication.migration.write_path) -}}
+{{- if and (eq .component "ingester") $componentSection.zone_aware_replication.migration.enabled (not $componentSection.zone_aware_replication.migration.write_path) -}}
 {{- $replicaPerZone = div (add $componentSection.zone_aware_replication.migration.replicas $numberOfZones -1) $numberOfZones -}}
 {{- end -}}
 {{- range $idx, $rolloutZone := $componentSection.zone_aware_replication.zones -}}

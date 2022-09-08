@@ -48,6 +48,12 @@ spec:
             - "-ingester.ring.zone-awareness-enabled=false"
             {{- end }}
           {{- end }}
+          {{- if .Values.store_gateway.zone_aware_replication.migration.enabled }}
+            {{- if not .Values.store_gateway.zone_aware_replication.migration.read_path }}
+            - "-store-gateway.sharding-ring.prefix="
+            - "-store-gateway.sharding-ring.zone-awareness-enabled=false"
+            {{- end }}
+          {{- end }}
           {{- range $key, $value := .Values.querier.extraArgs }}
             - "-{{ $key }}={{ $value }}"
           {{- end }}
