@@ -198,3 +198,32 @@
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- if and .Values.alertmanager.zone_aware_replication.enabled (not .Values.alertmanager.statefulSet.enabled) -}}
+{{- fail "You have set alertmanager.zone_aware_replication.enabled=true, but alertmanager.statefulSet.enabled=false. This is not a supported configuration." -}}
+{{- end -}}
+
+{{- if and .Values.alertmanager.zone_aware_replication.enabled (not ((($calculatedConfig).alertmanager).sharding_ring).zone_awareness_enabled) -}}
+{{- fail "You have set alertmanager.zone_aware_replication.enabled=true. The mimir.config must include alertmanager.sharding_ring.zone_awareness_enabled=true. Please merge the latest mimir.config from the chart with your mimir.config."}}
+{{- end -}}
+
+{{- if and .Values.alertmanager.zone_aware_replication.migration.enabled (ne ((($calculatedConfig).alertmanager).sharding_ring).instance_availability_zone "default") -}}
+{{- fail "You have set alertmanager.zone_aware_replication.migration.enabled=true. The mimir.config must include alertmanager.sharding_ring.instance_availability_zone=default. Please merge the latest mimir.config from the chart with your mimir.config."}}
+{{- end -}}
+
+{{- if and .Values.alertmanager.zone_aware_replication.migration.enabled (not .Values.alertmanager.zone_aware_replication.enabled) -}}
+{{- fail "You have set alertmanager.zone_aware_replication.migration.enabled=true, but alertmanager.zone_aware_replication.enabled=false. Please consult the Migrating from single zone with Helm document."}}
+{{- end -}}
+
+{{- with $.Values.alertmanager.zone_aware_replication.migration }}
+{{- $steps := list "enabled" "scale_down_default_zone" }}
+{{- range $i, $item := rest $steps -}}
+{{- range $j, $mustHave := slice $steps 0 $i }}
+{{- with $.Values.alertmanager.zone_aware_replication.migration }}
+{{- if and (index . $item) (not (index . $mustHave)) -}}
+{{- printf "You have set alertmanager.zone_aware_replication.migration.%s=true, but alertmanager.zone_aware_replication.migration.%s=false. Please consult the Migrating from single zone with Helm document." $item $mustHave | fail }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

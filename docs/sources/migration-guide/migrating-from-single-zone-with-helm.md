@@ -21,9 +21,160 @@ This document is applicable to both Grafana Mimir and Grafana Enterprise Metrics
 
 ## Migrate alertmanager to zone aware replication
 
+Using zone aware replication for alertmanager is optional and is only available if alertmanager is deployed as a StatefulSet.
+
 ### Configure zone aware replication for alertmanagers
 
-Follow the TBD operations-guide to set a desired configuration.
+This section is about planning and configuring the availability zones defined in the array value `alertmanager.zone_aware_replication.zones`.
+
+> **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
+
+There are two use cases in general:
+
+1. Speeding up rollout of alertmanagers. In this case the default value for `alertmanager.zone_aware_replication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node.
+1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
+   ```yaml
+   alertmanager:
+     zone_aware_replication:
+       enabled: false # Do not turn on zone awareness without migration because of potential query errors
+       zones:
+         - name: zone-a
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-a
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - alertmanager
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - alertmanager-zone-a
+                   topologyKey: "kubernetes.io/hostname"
+         - name: zone-b
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-b
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - alertmanager
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - alertmanager-zone-b
+                   topologyKey: "kubernetes.io/hostname"
+         - name: zone-c
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-c
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - alertmanager
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - alertmanager-zone-c
+                   topologyKey: "kubernetes.io/hostname"
+   ```
+
+Set the chosen configuration in your custom values (e.g. `custom.yaml`).
+
+> **Note**: The number of alertmanager pods that will be started is derived from `alertmanager.replicas`. Each zone will start `alertmanager.replicas / number of zones` pods, rounded up to the nearest integer value. For example if you have 3 zones, then `alertmanager.replicas=3` will yield 1 alertmanaer per zone, but `alertmanager.replicas=4` will yield 2 per zone, 6 in total.
+
+### Migrate alertmanager
+
+1. Create a new empty YAML file called `migrate.yaml`.
+
+1. Start the migration.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   alertmanger:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until all new alertmanagers are started.
+
+1. Scale down old alertmanagers to 0.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   alertmanger:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         scale_down_default_zone: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until old non zone aware alertmanagers are terminated.
+
+1. Set the final configuration.
+
+   **Merge** the last values in `migrate.yaml` into your regular `custom.yaml` file:
+
+   ```yaml
+   alertmanager:
+     zone_aware_replication:
+       enabled: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
+
+   ```yaml
+   alertmanager:
+     ...
+     {{- if .Values.alertmanager.zone_aware_replication.enabled }}
+     sharding_ring:
+       instance_availability_zone: default  # required due to bug in code which requires this field even if target is not the alertmanager
+       zone_awareness_enabled: true
+     {{- end }}
+   ```
+
+   If in doubt, set the following values:
+
+   ```yaml
+   mimir:
+     structuredConfig:
+       alertmanager:
+         sharding_ring:
+           instance_availability_zone: default
+           zone_awareness_enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
 ## Migrate store-gateways to zone aware replication
 
@@ -159,7 +310,7 @@ There are two ways to do the migration:
 
 1. Start the new zone aware store gateways.
 
-   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-store-gateways)
+   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for store gateways](#configure-zone-aware-replication-for-store-gateways)
 
    Copy the following into the `migrate.yaml`:
 
