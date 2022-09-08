@@ -29,7 +29,176 @@ Follow the TBD operations-guide to set a desired configuration.
 
 ### Configure zone aware replication for store-gateways
 
-Follow the TBD operations-guide to set a desired configuration.
+This section is about planning and configuring the availability zones defined in the array value `store_gateway.zone_aware_replication.zones`.
+
+> **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
+
+There are two use cases in general:
+
+1. Speeding up rollout of store gateways. In this case the default value for `store_gateway.zone_aware_replication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that store gateways from different zones do not mix, but it allows multiple store gateways of the same zone on the same node.
+1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: false # Do not turn on zone awareness without migration because of data loss
+       zones:
+         - name: zone-a
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-a
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - store-gateway
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - store-gateway-zone-a
+                   topologyKey: "kubernetes.io/hostname"
+         - name: zone-b
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-b
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - store-gateway
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - store-gateway-zone-b
+                   topologyKey: "kubernetes.io/hostname"
+         - name: zone-c
+           nodeSelector:
+             topology.kubernetes.io/zone: zone-c
+           affinity:
+             podAntiAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                     matchExpressions:
+                       - key: rollout-group
+                         operator: In
+                         values:
+                           - store-gateway
+                       - key: app.kubernetes.io/component
+                         operator: NotIn
+                         values:
+                           - store-gateway-zone-c
+                   topologyKey: "kubernetes.io/hostname"
+   ```
+
+Set the chosen configuration in your custom values (e.g. `custom.yaml`).
+
+> **Note**: Do not turn on zone awareness without migration because of outage, make sure that `store_gateway.zone_aware_replication.enabled` is set to false.
+
+```yaml
+store_gateway:
+  zone_aware_replication:
+    enabled: false
+```
+
+> **Note**: The number of store gateway pods that will be started is derived from `store_gateway.replicas`. Each zone will start `store_gateway.replicas / number of zones` pods, rounded up to the nearest integer value. For example if you have 3 zones, then `store_gateway.replicas=3` will yield 1 store gateway per zone, but `store_gateway.replicas=4` will yield 2 per zone, 6 in total.
+
+### Decide which migration path to take for store gateways
+
+There are two ways to do the migration:
+
+1. With downtime. In this [procedure](#migrate-store-gateways-with-downtime) ingress is stopped to the cluster while store gateways are migrated. This is the quicker and simpler way.
+1. Without downtime. This is a multi step [procedure](#migrate-store-gateways-without-downtime) which requires additional hardware resources as the old and new store gateways run in parallel for some time.
+
+### Migrate store gateways with downtime
+
+1. Create a new empty YAML file called `migrate.yaml`.
+
+1. Turn off traffic to the installation.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: false
+
+   nginx:
+     replicas: 0
+   gateway:
+     replicas: 0
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until there is no nginx or gateway running.
+
+1. Scale the current store gateways to 0.
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   store_gateway:
+     replicas: 0
+     zone_aware_replication:
+       enabled: false
+
+   nginx:
+     replicas: 0
+   gateway:
+     replicas: 0
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until no store-gateways are running.
+
+1. Start the new zone aware store gateways.
+
+   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-store-gateways)
+
+   Copy the following into the `migrate.yaml`:
+
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: true
+
+   nginx:
+     replicas: 0
+   gateway:
+     replicas: 0
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until all requested store gateways are running.
+
+1. Enable traffic to the installation.
+
+   **Merge** the following values into your regular `custom.yaml` file:
+
+   ```yaml
+   store_gateway:
+     zone_aware_replication:
+       enabled: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+   > **Note**: these values are actually the default, which means that removing the values `store_gateway.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+
+1. Upgrade the installation with the `helm` command using only your regular command line flags.
+
+### Migrate store gateways without downtime
 
 ## Migrate ingesters to zone aware replication
 
