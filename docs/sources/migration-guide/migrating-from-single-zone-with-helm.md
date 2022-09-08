@@ -59,11 +59,11 @@ There are two use cases in general:
                        - key: rollout-group
                          operator: In
                          values:
-                           - store-gateway
+                           - ingester
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-a
+                           - ingester-zone-a
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
@@ -76,11 +76,11 @@ There are two use cases in general:
                        - key: rollout-group
                          operator: In
                          values:
-                           - store-gateway
+                           - ingester
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-b
+                           - ingester-zone-b
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
@@ -93,11 +93,11 @@ There are two use cases in general:
                        - key: rollout-group
                          operator: In
                          values:
-                           - store-gateway
+                           - ingester
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-c
+                           - ingester-zone-c
                    topologyKey: "kubernetes.io/hostname"
    ```
 
@@ -113,7 +113,7 @@ ingester:
 
 > **Note**: The number of ingester pods that will be started is derived from `ingester.replicas`. Each zone will start `ingester.replicas / number of zones` pods, rounded up to the nearest integer value. For example if you have 3 zones, then `ingester.replicas=3` will yield 1 ingester per zone, but `ingester.replicas=4` will yield 2 per zone, 6 in total.
 
-### Decide which migration path to take
+### Decide which migration path to take for ingesters
 
 There are two ways to do the migration:
 
@@ -122,9 +122,9 @@ There are two ways to do the migration:
 
 ### Migrate ingesters with downtime
 
-1. Create a new empty YAML file called `migrate.yaml`
+1. Create a new empty YAML file called `migrate.yaml`.
 
-1. Enable flushing data from ingesters to storage on shutdown
+1. Enable flushing data from ingesters to storage on shutdown.
 
    Copy the following into the `migrate.yaml`:
 
@@ -136,13 +136,17 @@ There are two ways to do the migration:
        ingester:
          ring:
            unregister_on_shutdown: true
+
+   ingester:
+     zone_aware_replication:
+       enabled: false
    ```
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
 1. Wait for all ingesters to restart.
 
-1. Turn off writes to the installation
+1. Turn off traffic to the installation.
 
    Copy the following into the `migrate.yaml`:
 
@@ -154,6 +158,10 @@ There are two ways to do the migration:
        ingester:
          ring:
            unregister_on_shutdown: true
+
+   ingester:
+     zone_aware_replication:
+       enabled: false
 
    nginx:
      replicas: 0
@@ -165,7 +173,7 @@ There are two ways to do the migration:
 
 1. Wait until there is no nginx or gateway running.
 
-1. Scale the current ingesters to 0
+1. Scale the current ingesters to 0.
 
    Copy the following into the `migrate.yaml`:
 
@@ -178,12 +186,14 @@ There are two ways to do the migration:
          ring:
            unregister_on_shutdown: true
 
+   ingester:
+     replicas: 0
+     zone_aware_replication:
+       enabled: false
+
    nginx:
      replicas: 0
    gateway:
-     replicas: 0
-
-   ingester:
      replicas: 0
    ```
 
@@ -191,21 +201,21 @@ There are two ways to do the migration:
 
 1. Wait until no ingesters are running.
 
-1. Start the new zone aware ingesters
+1. Start the new zone aware ingesters.
 
    > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters)
 
    Copy the following into the `migrate.yaml`:
 
    ```yaml
+   ingester:
+     zone_aware_replication:
+       enabled: true
+
    nginx:
      replicas: 0
    gateway:
      replicas: 0
-
-   ingester:
-     zone_aware_replication:
-       enabled: true
 
    rollout_operator:
      enabled: true
@@ -215,7 +225,7 @@ There are two ways to do the migration:
 
 1. Wait until all requested ingesters are running.
 
-1. Enable writes to the installation
+1. Enable traffic to the installation.
 
    **Merge** the following values into your regular `custom.yaml` file:
 
