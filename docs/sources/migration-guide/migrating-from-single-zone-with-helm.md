@@ -40,7 +40,7 @@ There are two use cases in general:
    ```yaml
    store_gateway:
      zone_aware_replication:
-       enabled: false # Do not turn on zone awareness without migration because of data loss
+       enabled: false # Do not turn on zone awareness without migration because of potential query errors
        zones:
          - name: zone-a
            nodeSelector:
@@ -97,7 +97,7 @@ There are two use cases in general:
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
-> **Note**: Do not turn on zone awareness without migration because of outage, make sure that `store_gateway.zone_aware_replication.enabled` is set to false.
+> **Note**: Do not turn on zone awareness without migration because of potential query errors, make sure that `store_gateway.zone_aware_replication.enabled` is set to false.
 
 ```yaml
 store_gateway:
