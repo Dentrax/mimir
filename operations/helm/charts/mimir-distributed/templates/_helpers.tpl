@@ -234,6 +234,7 @@ Params:
   ctx = . context
   component = name of the component
   memberlist = true if part of memberlist gossip ring
+  rolloutZoneName = rollout zone name (optional)
 */}}
 {{- define "mimir.podLabels" -}}
 {{- if .ctx.Values.enterprise.legacyLabels }}
@@ -303,6 +304,7 @@ Service selector labels
 Params:
   ctx = . context
   component = name of the component
+  rolloutZoneName = rollout zone name (optional)
 */}}
 {{- define "mimir.selectorLabels" -}}
 {{- if .ctx.Values.enterprise.legacyLabels }}
