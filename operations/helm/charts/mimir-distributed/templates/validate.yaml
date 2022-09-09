@@ -216,7 +216,7 @@
 {{- end -}}
 
 {{- with $.Values.alertmanager.zone_aware_replication.migration }}
-{{- $steps := list "enabled" "scale_down_default_zone" }}
+{{- $steps := list "enabled" "write_path" "scale_down_default_zone" }}
 {{- range $i, $item := rest $steps -}}
 {{- range $j, $mustHave := slice $steps 0 $i }}
 {{- with $.Values.alertmanager.zone_aware_replication.migration }}

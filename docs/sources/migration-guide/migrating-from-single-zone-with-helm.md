@@ -19,6 +19,8 @@ This document is applicable to both Grafana Mimir and Grafana Enterprise Metrics
 
 1. The installation is already upgraded to `mimir-distributed` Helm chart version 4.0.0 or later.
 
+1. If you have modified the `mimir.config` value, please make sure to merge in the latest version from the chart. Or consider using `mimir.structuredConfig` instead, see [Manage the configuration of Grafana Mimir with Helm]({{< relref "../operators-guide/running-production-environment-with-helm/configuration-with-helm.md" >}})
+
 ## Migrate alertmanager to zone aware replication
 
 Using zone aware replication for alertmanager is optional and is only available if alertmanager is deployed as a StatefulSet.
@@ -116,7 +118,27 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait until all new alertmanagers are started.
+   In this step zone awareness is enabled with the default zone. In this step new StatefulSets are created for zone aware alertmanagers, but no new pods are started.
+
+1. Wait until all alertmanagers are restarted.
+
+1. Scale up zone aware alertmanagers.
+
+   ```yaml
+   alertmanger:
+     zone_aware_replication:
+       enabled: true
+       migration:
+         enabled: true
+         write_path: true
+
+   rollout_operator:
+     enabled: true
+   ```
+
+1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+1. Wait until all new zone aware alertmanagers are started.
 
 1. Scale down old alertmanagers to 0.
 
@@ -128,6 +150,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
        enabled: true
        migration:
          enabled: true
+         write_path: true
          scale_down_default_zone: true
 
    rollout_operator:
@@ -156,11 +179,11 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    ```yaml
    alertmanager:
      ...
-     {{- if .Values.alertmanager.zone_aware_replication.enabled }}
      sharding_ring:
        instance_availability_zone: default  # required due to bug in code which requires this field even if target is not the alertmanager
+       {{- if .Values.alertmanager.zone_aware_replication.enabled }}
        zone_awareness_enabled: true
-     {{- end }}
+       {{- end }}
    ```
 
    If in doubt, set the following values:
