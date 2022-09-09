@@ -55,7 +55,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - alertmanager-zone-a
+                           - alertmanager-zone-a  # <-- zone-a comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
@@ -72,7 +72,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - alertmanager-zone-b
+                           - alertmanager-zone-b  # <-- zone-b comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
@@ -89,7 +89,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - alertmanager-zone-c
+                           - alertmanager-zone-c  # <-- zone-c comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
    ```
 
@@ -231,7 +231,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-a
+                           - store-gateway-zone-a  # <-- zone-a comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
@@ -248,7 +248,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-b
+                           - store-gateway-zone-b  # <-- zone-b comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
@@ -265,7 +265,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-c
+                           - store-gateway-zone-c  # <-- zone-c comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
    ```
 
@@ -516,7 +516,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - ingester-zone-a
+                           - ingester-zone-a  # <-- zone-a comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
@@ -533,7 +533,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - ingester-zone-b
+                           - ingester-zone-b  # <-- zone-b comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
@@ -550,7 +550,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - ingester-zone-c
+                           - ingester-zone-c  # <-- zone-c comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
    ```
 
