@@ -106,7 +106,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    Copy the following into the `migrate.yaml`:
 
    ```yaml
-   alertmanger:
+   alertmanager:
      zone_aware_replication:
        enabled: true
        migration:
@@ -125,7 +125,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 1. Scale up zone aware alertmanagers.
 
    ```yaml
-   alertmanger:
+   alertmanager:
      zone_aware_replication:
        enabled: true
        migration:
@@ -145,7 +145,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    Copy the following into the `migrate.yaml`:
 
    ```yaml
-   alertmanger:
+   alertmanager:
      zone_aware_replication:
        enabled: true
        migration:
