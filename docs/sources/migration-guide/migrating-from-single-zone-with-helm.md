@@ -115,6 +115,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+   [](alertmanager-step1)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -135,6 +136,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+   [](alertmanager-step2)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -156,6 +158,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+   [](alertmanager-step3)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -173,6 +176,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+   [](alertmanager-step4)
 
    > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
 
@@ -390,6 +394,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](storegateway-step1)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -414,6 +419,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](storegateway-step2)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -435,6 +441,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](storegateway-step3)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -452,6 +459,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](storegateway-step4)
 
    These values are actually the default, which means that removing the values `store_gateway.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
@@ -734,6 +742,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](ingester-step1)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -756,6 +765,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](ingester-step2)
 
    > **Note**: replace `<N>` with the number of replicas in each step until `<N>` reaches the same number as in `ingester.replicas`, do not increase `<N>` with more than 21 in each step.
 
@@ -782,6 +792,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](ingester-step3)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -807,6 +818,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](ingester-step4)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -831,6 +843,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](ingester-step5)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -856,6 +869,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](ingester-step6)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
@@ -873,6 +887,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+   [](ingester-step7)
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
