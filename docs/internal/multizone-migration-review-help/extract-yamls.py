@@ -26,7 +26,7 @@ if len(sys.argv) != 2:
 f = open(sys.argv[1], "r")
 
 codeblock = re.compile("\s*```(yaml)?")
-meta = re.compile("\s*\[\]\(([^)]+)\)")
+meta = re.compile('\s*\[//\]: # "([^"]+-step\d+)"')
 state = "init"
 for line in f:
     if state == "init":
