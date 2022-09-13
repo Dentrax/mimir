@@ -1,0 +1,12 @@
+ingester:
+  zone_aware_replication:
+    enabled: true
+    migration:
+      enabled: true
+      write_path: true
+      read_path: true
+      exclude_default_zone: true
+      scale_down_default_zone: true
+
+rollout_operator:
+  enabled: true

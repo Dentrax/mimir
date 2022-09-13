@@ -1,0 +1,6 @@
+store_gateway:
+  zone_aware_replication:
+    enabled: true
+
+rollout_operator:
+  enabled: true

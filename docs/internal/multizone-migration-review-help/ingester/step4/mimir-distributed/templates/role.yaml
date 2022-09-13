@@ -1,0 +1,18 @@
+---
+# Source: mimir-distributed/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: krajo-mimir
+  labels:
+    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: krajo
+    app.kubernetes.io/version: "r202"
+    app.kubernetes.io/managed-by: Helm
+  namespace: "default"
+rules:
+- apiGroups:      ['extensions']
+  resources:      ['podsecuritypolicies']
+  verbs:          ['use']
+  resourceNames:  [krajo-mimir]

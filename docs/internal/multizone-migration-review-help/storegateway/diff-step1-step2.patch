@@ -1,0 +1,28 @@
+diff -c -r step1/mimir-distributed/templates/querier/querier-dep.yaml step2/mimir-distributed/templates/querier/querier-dep.yaml
+*** step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:15:22.749859751 +0200
+--- step2/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:15:32.377662227 +0200
+***************
+*** 52,59 ****
+              - "-target=querier"
+              - "-config.expand-env=true"
+              - "-config.file=/etc/mimir/mimir.yaml"
+-             - "-store-gateway.sharding-ring.prefix="
+-             - "-store-gateway.sharding-ring.zone-awareness-enabled=false"
+            volumeMounts:
+              - name: config
+                mountPath: /etc/mimir
+--- 52,57 ----
+diff -c -r step1/mimir-distributed/templates/ruler/ruler-dep.yaml step2/mimir-distributed/templates/ruler/ruler-dep.yaml
+*** step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:15:22.749859751 +0200
+--- step2/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:15:32.377662227 +0200
+***************
+*** 53,60 ****
+              - "-target=ruler"
+              - "-config.expand-env=true"
+              - "-config.file=/etc/mimir/mimir.yaml"
+-             - "-store-gateway.sharding-ring.prefix="
+-             - "-store-gateway.sharding-ring.zone-awareness-enabled=false"
+            volumeMounts:
+              - name: config
+                mountPath: /etc/mimir
+--- 53,58 ----

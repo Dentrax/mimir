@@ -1,0 +1,13 @@
+diff -c -r step3/mimir-distributed/templates/querier/querier-dep.yaml step4/mimir-distributed/templates/querier/querier-dep.yaml
+*** step3/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:14:27.934693976 +0200
+--- step4/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:14:37.306591681 +0200
+***************
+*** 52,58 ****
+              - "-target=querier"
+              - "-config.expand-env=true"
+              - "-config.file=/etc/mimir/mimir.yaml"
+-             - "-ingester.ring.zone-awareness-enabled=false"
+            volumeMounts:
+              - name: config
+                mountPath: /etc/mimir
+--- 52,57 ----

@@ -1,0 +1,372 @@
+---
+# Source: mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: krajo-mimir-alertmanager-zone-a
+  labels:
+    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: krajo
+    app.kubernetes.io/component: alertmanager
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: "r202"
+    app.kubernetes.io/managed-by: Helm
+    name: "alertmanager-zone-a"
+    rollout-group: alertmanager
+    zone: zone-a
+  annotations:
+    rollout-max-unavailable: "2"
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimir
+      app.kubernetes.io/instance: krajo
+      app.kubernetes.io/component: alertmanager
+      rollout-group: alertmanager
+      zone: zone-a
+  updateStrategy:
+    type: OnDelete
+  serviceName: krajo-mimir-alertmanager
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "1Gi"
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+        app.kubernetes.io/name: mimir
+        app.kubernetes.io/instance: krajo
+        app.kubernetes.io/version: "r202"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: alertmanager
+        app.kubernetes.io/part-of: memberlist
+        name: "alertmanager-zone-a"
+        rollout-group: alertmanager
+        zone: zone-a
+      annotations:
+      namespace: "default"
+    spec:
+      serviceAccountName: krajo-mimir
+      securityContext:
+        {}
+      initContainers:
+        []
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: config
+          configMap:
+            name: krajo-mimir-config
+            items:
+              - key: "mimir.yaml"
+                path: "mimir.yaml"
+        - name: runtime-config
+          configMap:
+            name: krajo-mimir-runtime
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: alertmanager
+          image: "grafana/mimir:r202-d1db3dc"
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-target=alertmanager"
+            - "-config.expand-env=true"
+            - "-config.file=/etc/mimir/mimir.yaml"
+            - "-alertmanager.sharding-ring.instance-availability-zone=zone-a"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+            - name: runtime-config
+              mountPath: /var/mimir
+            - name: storage
+              mountPath: "/data"
+            - name: tmp
+              mountPath: /tmp
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: memberlist
+              containerPort: 7946
+              protocol: TCP
+          livenessProbe:
+            null
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 45
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+          env:
+          envFrom:
+---
+# Source: mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: krajo-mimir-alertmanager-zone-b
+  labels:
+    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: krajo
+    app.kubernetes.io/component: alertmanager
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: "r202"
+    app.kubernetes.io/managed-by: Helm
+    name: "alertmanager-zone-b"
+    rollout-group: alertmanager
+    zone: zone-b
+  annotations:
+    rollout-max-unavailable: "2"
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimir
+      app.kubernetes.io/instance: krajo
+      app.kubernetes.io/component: alertmanager
+      rollout-group: alertmanager
+      zone: zone-b
+  updateStrategy:
+    type: OnDelete
+  serviceName: krajo-mimir-alertmanager
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "1Gi"
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+        app.kubernetes.io/name: mimir
+        app.kubernetes.io/instance: krajo
+        app.kubernetes.io/version: "r202"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: alertmanager
+        app.kubernetes.io/part-of: memberlist
+        name: "alertmanager-zone-b"
+        rollout-group: alertmanager
+        zone: zone-b
+      annotations:
+      namespace: "default"
+    spec:
+      serviceAccountName: krajo-mimir
+      securityContext:
+        {}
+      initContainers:
+        []
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: config
+          configMap:
+            name: krajo-mimir-config
+            items:
+              - key: "mimir.yaml"
+                path: "mimir.yaml"
+        - name: runtime-config
+          configMap:
+            name: krajo-mimir-runtime
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: alertmanager
+          image: "grafana/mimir:r202-d1db3dc"
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-target=alertmanager"
+            - "-config.expand-env=true"
+            - "-config.file=/etc/mimir/mimir.yaml"
+            - "-alertmanager.sharding-ring.instance-availability-zone=zone-b"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+            - name: runtime-config
+              mountPath: /var/mimir
+            - name: storage
+              mountPath: "/data"
+            - name: tmp
+              mountPath: /tmp
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: memberlist
+              containerPort: 7946
+              protocol: TCP
+          livenessProbe:
+            null
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 45
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+          env:
+          envFrom:
+---
+# Source: mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: krajo-mimir-alertmanager-zone-c
+  labels:
+    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: krajo
+    app.kubernetes.io/component: alertmanager
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: "r202"
+    app.kubernetes.io/managed-by: Helm
+    name: "alertmanager-zone-c"
+    rollout-group: alertmanager
+    zone: zone-c
+  annotations:
+    rollout-max-unavailable: "2"
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimir
+      app.kubernetes.io/instance: krajo
+      app.kubernetes.io/component: alertmanager
+      rollout-group: alertmanager
+      zone: zone-c
+  updateStrategy:
+    type: OnDelete
+  serviceName: krajo-mimir-alertmanager
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "1Gi"
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+        app.kubernetes.io/name: mimir
+        app.kubernetes.io/instance: krajo
+        app.kubernetes.io/version: "r202"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: alertmanager
+        app.kubernetes.io/part-of: memberlist
+        name: "alertmanager-zone-c"
+        rollout-group: alertmanager
+        zone: zone-c
+      annotations:
+      namespace: "default"
+    spec:
+      serviceAccountName: krajo-mimir
+      securityContext:
+        {}
+      initContainers:
+        []
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: config
+          configMap:
+            name: krajo-mimir-config
+            items:
+              - key: "mimir.yaml"
+                path: "mimir.yaml"
+        - name: runtime-config
+          configMap:
+            name: krajo-mimir-runtime
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: alertmanager
+          image: "grafana/mimir:r202-d1db3dc"
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-target=alertmanager"
+            - "-config.expand-env=true"
+            - "-config.file=/etc/mimir/mimir.yaml"
+            - "-alertmanager.sharding-ring.instance-availability-zone=zone-c"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+            - name: runtime-config
+              mountPath: /var/mimir
+            - name: storage
+              mountPath: "/data"
+            - name: tmp
+              mountPath: /tmp
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: memberlist
+              containerPort: 7946
+              protocol: TCP
+          livenessProbe:
+            null
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 45
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+          env:
+          envFrom:

@@ -1,0 +1,20 @@
+diff -c -r step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+*** step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:29.338824503 +0200
+--- step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:39.518874915 +0200
+***************
+*** 16,22 ****
+      {}
+    namespace: "default"
+  spec:
+!   replicas: 1
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir
+--- 16,22 ----
+      {}
+    namespace: "default"
+  spec:
+!   replicas: 0
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir

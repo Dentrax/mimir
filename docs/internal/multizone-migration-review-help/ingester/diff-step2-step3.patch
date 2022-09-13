@@ -1,0 +1,26 @@
+diff -c -r step2/mimir-distributed/templates/distributor/distributor-dep.yaml step3/mimir-distributed/templates/distributor/distributor-dep.yaml
+*** step2/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-13 08:14:18.562776627 +0200
+--- step3/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-13 08:14:27.938693936 +0200
+***************
+*** 53,59 ****
+              - "-target=distributor"
+              - "-config.expand-env=true"
+              - "-config.file=/etc/mimir/mimir.yaml"
+-             - "-ingester.ring.zone-awareness-enabled=false"
+            volumeMounts:
+              - name: config
+                mountPath: /etc/mimir
+--- 53,58 ----
+diff -c -r step2/mimir-distributed/templates/ruler/ruler-dep.yaml step3/mimir-distributed/templates/ruler/ruler-dep.yaml
+*** step2/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:14:18.558776658 +0200
+--- step3/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:14:27.934693976 +0200
+***************
+*** 53,59 ****
+              - "-target=ruler"
+              - "-config.expand-env=true"
+              - "-config.file=/etc/mimir/mimir.yaml"
+-             - "-ingester.ring.zone-awareness-enabled=false"
+            volumeMounts:
+              - name: config
+                mountPath: /etc/mimir
+--- 53,58 ----

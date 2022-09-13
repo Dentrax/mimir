@@ -1,0 +1,108 @@
+---
+# Source: mimir-distributed/templates/ruler/ruler-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: krajo-mimir-ruler
+  labels:
+    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: krajo
+    app.kubernetes.io/component: ruler
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: "r202"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    {}
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimir
+      app.kubernetes.io/instance: krajo
+      app.kubernetes.io/component: ruler
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+        app.kubernetes.io/name: mimir
+        app.kubernetes.io/instance: krajo
+        app.kubernetes.io/version: "r202"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: ruler
+        app.kubernetes.io/part-of: memberlist
+      annotations:
+      namespace: "default"
+    spec:
+      serviceAccountName: krajo-mimir
+      securityContext:
+        {}
+      initContainers:
+        []
+      containers:
+        - name: ruler
+          image: "grafana/mimir:r202-d1db3dc"
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-target=ruler"
+            - "-config.expand-env=true"
+            - "-config.file=/etc/mimir/mimir.yaml"
+            - "-ingester.ring.zone-awareness-enabled=false"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+            - name: runtime-config
+              mountPath: /var/mimir
+            - name: storage
+              mountPath: "/data"
+              subPath: 
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: memberlist
+              containerPort: 7946
+              protocol: TCP
+          livenessProbe:
+            null
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 45
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+          env:
+          envFrom:
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: config
+          configMap:
+            name: krajo-mimir-config
+            items:
+              - key: "mimir.yaml"
+                path: "mimir.yaml"
+        - name: runtime-config
+          configMap:
+            name: krajo-mimir-runtime
+        - name: storage
+          emptyDir: {}

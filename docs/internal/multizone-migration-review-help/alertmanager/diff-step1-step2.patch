@@ -1,0 +1,54 @@
+diff -c -r step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+*** step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:20.098747132 +0200
+--- step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:29.338824503 +0200
+***************
+*** 134,140 ****
+      rollout-max-unavailable: "2"
+    namespace: "default"
+  spec:
+!   replicas: 0
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir
+--- 134,140 ----
+      rollout-max-unavailable: "2"
+    namespace: "default"
+  spec:
+!   replicas: 1
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir
+***************
+*** 258,264 ****
+      rollout-max-unavailable: "2"
+    namespace: "default"
+  spec:
+!   replicas: 0
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir
+--- 258,264 ----
+      rollout-max-unavailable: "2"
+    namespace: "default"
+  spec:
+!   replicas: 1
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir
+***************
+*** 382,388 ****
+      rollout-max-unavailable: "2"
+    namespace: "default"
+  spec:
+!   replicas: 0
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir
+--- 382,388 ----
+      rollout-max-unavailable: "2"
+    namespace: "default"
+  spec:
+!   replicas: 1
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: mimir

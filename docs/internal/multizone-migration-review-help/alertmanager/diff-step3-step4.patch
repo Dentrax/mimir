@@ -1,0 +1,201 @@
+diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:39.518874915 +0200
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:49.370891480 +0200
+***************
+*** 3,123 ****
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+-   name: krajo-mimir-alertmanager
+-   labels:
+-     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+-     app.kubernetes.io/name: mimir
+-     app.kubernetes.io/instance: krajo
+-     app.kubernetes.io/component: alertmanager
+-     app.kubernetes.io/part-of: memberlist
+-     app.kubernetes.io/version: "r202"
+-     app.kubernetes.io/managed-by: Helm
+-   annotations:
+-     {}
+-   namespace: "default"
+- spec:
+-   replicas: 0
+-   selector:
+-     matchLabels:
+-       app.kubernetes.io/name: mimir
+-       app.kubernetes.io/instance: krajo
+-       app.kubernetes.io/component: alertmanager
+-   updateStrategy:
+-     type: RollingUpdate
+-   serviceName: krajo-mimir-alertmanager
+-   volumeClaimTemplates:
+-     - metadata:
+-         name: storage
+-       spec:
+-         accessModes:
+-           - ReadWriteOnce
+-         resources:
+-           requests:
+-             storage: "1Gi"
+-   template:
+-     metadata:
+-       labels:
+-         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+-         app.kubernetes.io/name: mimir
+-         app.kubernetes.io/instance: krajo
+-         app.kubernetes.io/version: "r202"
+-         app.kubernetes.io/managed-by: Helm
+-         app.kubernetes.io/component: alertmanager
+-         app.kubernetes.io/part-of: memberlist
+-       annotations:
+-       namespace: "default"
+-     spec:
+-       serviceAccountName: krajo-mimir
+-       securityContext:
+-         {}
+-       initContainers:
+-         []
+-       nodeSelector:
+-         {}
+-       affinity:
+-         {}
+-       tolerations:
+-         []
+-       terminationGracePeriodSeconds: 60
+-       volumes:
+-         - name: config
+-           configMap:
+-             name: krajo-mimir-config
+-             items:
+-               - key: "mimir.yaml"
+-                 path: "mimir.yaml"
+-         - name: runtime-config
+-           configMap:
+-             name: krajo-mimir-runtime
+-         - name: tmp
+-           emptyDir: {}
+-       containers:
+-         - name: alertmanager
+-           image: "grafana/mimir:r202-d1db3dc"
+-           imagePullPolicy: IfNotPresent
+-           args:
+-             - "-target=alertmanager"
+-             - "-config.expand-env=true"
+-             - "-config.file=/etc/mimir/mimir.yaml"
+-           volumeMounts:
+-             - name: config
+-               mountPath: /etc/mimir
+-             - name: runtime-config
+-               mountPath: /var/mimir
+-             - name: storage
+-               mountPath: "/data"
+-             - name: tmp
+-               mountPath: /tmp
+-           ports:
+-             - name: http-metrics
+-               containerPort: 8080
+-               protocol: TCP
+-             - name: grpc
+-               containerPort: 9095
+-               protocol: TCP
+-             - name: memberlist
+-               containerPort: 7946
+-               protocol: TCP
+-           livenessProbe:
+-             null
+-           readinessProbe:
+-             httpGet:
+-               path: /ready
+-               port: http-metrics
+-             initialDelaySeconds: 45
+-           resources:
+-             requests:
+-               cpu: 10m
+-               memory: 32Mi
+-           securityContext:
+-             readOnlyRootFilesystem: true
+-           env:
+-           envFrom:
+- ---
+- # Source: mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+- apiVersion: apps/v1
+- kind: StatefulSet
+- metadata:
+    name: krajo-mimir-alertmanager-zone-a
+    labels:
+      helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+--- 3,8 ----
+diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-13 08:13:39.518874915 +0200
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-13 08:13:49.366891479 +0200
+***************
+*** 3,40 ****
+  apiVersion: v1
+  kind: Service
+  metadata:
+-   name: krajo-mimir-alertmanager
+-   labels:
+-     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+-     app.kubernetes.io/name: mimir
+-     app.kubernetes.io/instance: krajo
+-     app.kubernetes.io/component: alertmanager
+-     app.kubernetes.io/part-of: memberlist
+-     app.kubernetes.io/version: "r202"
+-     app.kubernetes.io/managed-by: Helm
+-   annotations:
+-     {}
+-   namespace: "default"
+- spec:
+-   type: ClusterIP
+-   ports:
+-     - port: 8080
+-       protocol: TCP
+-       name: http-metrics
+-       targetPort: http-metrics
+-     - port: 9095
+-       protocol: TCP
+-       name: grpc
+-       targetPort: grpc
+-   selector:
+-     app.kubernetes.io/name: mimir
+-     app.kubernetes.io/instance: krajo
+-     app.kubernetes.io/component: alertmanager
+- ---
+- # Source: mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
+- apiVersion: v1
+- kind: Service
+- metadata:
+    name: krajo-mimir-alertmanager-zone-a
+    labels:
+      helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+--- 3,8 ----
+***************
+*** 47,53 ****
+      name: "alertmanager-zone-a"
+      rollout-group: alertmanager
+      zone: zone-a
+-     prometheus.io/service-monitor: "false"
+    annotations:
+      {}
+    namespace: "default"
+--- 15,20 ----
+***************
+*** 85,91 ****
+      name: "alertmanager-zone-b"
+      rollout-group: alertmanager
+      zone: zone-b
+-     prometheus.io/service-monitor: "false"
+    annotations:
+      {}
+    namespace: "default"
+--- 52,57 ----
+***************
+*** 123,129 ****
+      name: "alertmanager-zone-c"
+      rollout-group: alertmanager
+      zone: zone-c
+-     prometheus.io/service-monitor: "false"
+    annotations:
+      {}
+    namespace: "default"
+--- 89,94 ----

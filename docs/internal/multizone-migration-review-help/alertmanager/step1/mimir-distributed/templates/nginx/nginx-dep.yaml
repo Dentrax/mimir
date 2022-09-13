@@ -1,0 +1,96 @@
+---
+# Source: mimir-distributed/templates/nginx/nginx-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: krajo-mimir-nginx
+  labels:
+    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: krajo
+    app.kubernetes.io/component: nginx
+    app.kubernetes.io/version: "r202"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    {}
+  namespace: "default"
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimir
+      app.kubernetes.io/instance: krajo
+      app.kubernetes.io/component: nginx
+  template:
+    metadata:
+      annotations:
+      labels:
+        helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+        app.kubernetes.io/name: mimir
+        app.kubernetes.io/instance: krajo
+        app.kubernetes.io/version: "r202"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: nginx
+      namespace: "default"
+    spec:
+      serviceAccountName: krajo-mimir
+      securityContext:
+        fsGroup: 101
+        runAsGroup: 101
+        runAsNonRoot: true
+        runAsUser: 101
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: nginx
+          image: docker.io/nginxinc/nginx-unprivileged:1.22-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-metric
+              containerPort: 8080
+              protocol: TCP
+          env:
+          envFrom:
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http-metric
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx
+            - name: tmp
+              mountPath: /tmp
+            - name: docker-entrypoint-d-override
+              mountPath: /docker-entrypoint.d
+          resources:
+            {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - nginx
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+        
+      volumes:
+        - name: config
+          configMap:
+            name: krajo-mimir-nginx
+        - name: tmp
+          emptyDir: {}
+        - name: docker-entrypoint-d-override
+          emptyDir: {}
