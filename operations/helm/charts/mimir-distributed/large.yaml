@@ -26,14 +26,6 @@ alertmanager:
       memory: 6Gi
   statefulSet:
     enabled: true
-  zoneAwareReplication:
-    zones:
-    - name: zone-a
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-b
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-c
-      topologyKey: 'kubernetes.io/hostname'
 
 compactor:
   persistentVolume:
@@ -66,14 +58,7 @@ ingester:
       cpu: 4
       memory: 15Gi
   zoneAwareReplication:
-    zones:
-    - name: zone-a
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-b
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-c
-      topologyKey: 'kubernetes.io/hostname'
-
+    topologyKey: 'kubernetes.io/hostname'
 
 chunks-cache:
   enabled: true
@@ -138,13 +123,7 @@ store_gateway:
       cpu: 1
       memory: 6Gi
   zoneAwareReplication:
-    zones:
-    - name: zone-a
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-b
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-c
-      topologyKey: 'kubernetes.io/hostname'
+    topologyKey: 'kubernetes.io/hostname'
 
 # Grafana Enterprise Metrics feature related
 admin_api:

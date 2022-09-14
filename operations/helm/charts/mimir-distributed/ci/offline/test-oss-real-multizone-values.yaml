@@ -13,13 +13,7 @@ alertmanager:
     enabled: false
   zoneAwareReplication:
     enabled: true
-    zones:
-    - name: zone-a
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-b
-      topologyKey: 'kubernetes.io/hostname'
-    - name: zone-c
-      topologyKey: 'kubernetes.io/hostname'
+    topologyKey: 'kubernetes.io/hostname'
 
 compactor:
   resources:
@@ -34,9 +28,9 @@ ingester:
     enabled: false
   zoneAwareReplication:
     enabled: true
+    topologyKey: 'kubernetes.io/hostname'
     zones:
     - name: zone-a
-      topologyKey: 'kubernetes.io/hostname'
       extraAffinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -48,7 +42,6 @@ ingester:
                 - S1
             topologyKey: topology.kubernetes.io/zone
     - name: zone-b
-      topologyKey: 'kubernetes.io/hostname'
       extraAffinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -60,7 +53,6 @@ ingester:
                 - S1
             topologyKey: topology.kubernetes.io/zone
     - name: zone-c
-      topologyKey: 'kubernetes.io/hostname'
       extraAffinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -79,19 +71,17 @@ store_gateway:
     enabled: false
   zoneAwareReplication:
     enabled: true
+    topologyKey: 'kubernetes.io/hostname'
     zones:
     - name: zone-a
       nodeSelector:
         topology.kubernetes.io/zone: zone-a
-      topologyKey: 'kubernetes.io/hostname'
     - name: zone-b
       nodeSelector:
         topology.kubernetes.io/zone: zone-b
-      topologyKey: 'kubernetes.io/hostname'
     - name: zone-c
       nodeSelector:
         topology.kubernetes.io/zone: zone-c
-      topologyKey: 'kubernetes.io/hostname'
 
 querier:
   resources:

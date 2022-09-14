@@ -464,7 +464,7 @@ Params:
 {{- end -}}
 {{- range $idx, $rolloutZone := $componentSection.zoneAwareReplication.zones -}}
 {{- $_ := set $zonesMap $rolloutZone.name (dict
-  "affinity" (($rolloutZone.extraAffinity | default (dict)) | mergeOverwrite (include "mimir.zoneAntiAffinity" (dict "component" $.component "rolloutZoneName" $rolloutZone.name "topologyKey" $rolloutZone.topologyKey ) | fromYaml ) )
+  "affinity" (($rolloutZone.extraAffinity | default (dict)) | mergeOverwrite (include "mimir.zoneAntiAffinity" (dict "component" $.component "rolloutZoneName" $rolloutZone.name "topologyKey" $componentSection.zoneAwareReplication.topologyKey ) | fromYaml ) )
   "nodeSelector" ($rolloutZone.nodeSelector | default (dict) )
   "replicas" $replicaPerZone
   ) -}}

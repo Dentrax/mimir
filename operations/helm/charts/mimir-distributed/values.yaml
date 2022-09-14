@@ -500,6 +500,9 @@ alertmanager:
     enabled: false
     # -- Maximum number of alertmanagers that can be unavailable per zone during rollout
     maxUnavailable: 2
+    # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+    # E.g.: topologyKey: 'kubernetes.io/hostname'
+    topologyKey: null
     # -- Auxiliary values for migration, see https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm/
     migration:
       # -- Indicate if migration is ongoing for multi zone alertmanager
@@ -516,8 +519,6 @@ alertmanager:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-a
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
     # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -526,8 +527,6 @@ alertmanager:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-b
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
     # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -536,8 +535,6 @@ alertmanager:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-c
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
 
@@ -732,6 +729,9 @@ ingester:
     enabled: true
     # -- Maximum number of ingesters that can be unavailable per zone during rollout
     maxUnavailable: 25
+    # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+    # E.g.: topologyKey: 'kubernetes.io/hostname'
+    topologyKey: null
     # -- Auxiliary values for migration, see https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm/
     migration:
       # -- Indicate if migration is ongoing for multi zone ingester
@@ -754,8 +754,6 @@ ingester:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-a
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
     # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -764,8 +762,6 @@ ingester:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-b
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
     # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -774,8 +770,6 @@ ingester:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-c
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
 
@@ -1241,6 +1235,9 @@ store_gateway:
     enabled: true
     # -- Maximum number of store-gateways that can be unavailable per zone during rollout
     maxUnavailable: 10
+    # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+    # E.g.: topologyKey: 'kubernetes.io/hostname'
+    topologyKey: null
     # -- Auxiliary values for migration, see https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm/
     migration:
       # -- Indicate if migration is ongoing for multi zone store-gateway
@@ -1257,8 +1254,6 @@ store_gateway:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-a
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
     # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -1267,8 +1262,6 @@ store_gateway:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-b
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
     # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -1277,8 +1270,6 @@ store_gateway:
       # nodeSelector:
       #   topology.kubernetes.io/zone: zone-c
       nodeSelector: null
-      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
-      topologyKey: null
       # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
       extraAffinity: {}
 
