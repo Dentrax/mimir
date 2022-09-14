@@ -376,7 +376,9 @@ alertmanager:
   # -- The name of the PriorityClass for alertmanager pods
   priorityClassName: null
 
+  # -- NodeSelector to pin alertmanager pods to certain set of nodes. This is ignored when alertmanager.zone_aware_replication.enabled=true.
   nodeSelector: {}
+  # -- Pod affinity settings for the alertmanager. This is ignored when alertmanager.zone_aware_replication.enabled=true.
   affinity: {}
 
   # -- topologySpreadConstraints allows to customize part of the default topologySpreadConstraints. labelSelectors
@@ -646,7 +648,9 @@ ingester:
 
   podManagementPolicy: Parallel
 
+  # -- NodeSelector to pin ingester pods to certain set of nodes. This is ignored when ingester.zone_aware_replication.enabled=true.
   nodeSelector: {}
+  # -- Pod affinity settings for the ingester. This is ignored when ingester.zone_aware_replication.enabled=true.
   affinity: {}
 
   # -- topologySpreadConstraints allows to customize part of the default topologySpreadConstraints. labelSelectors
@@ -1168,7 +1172,9 @@ store_gateway:
   # -- The name of the PriorityClass for store-gateway pods
   priorityClassName: null
 
+  # -- NodeSelector to pin store-gateway pods to certain set of nodes. This is ignored when store_gateway.zone_aware_replication.enabled=true.
   nodeSelector: {}
+  # -- Pod affinity settings for the store_gateway. This is ignored when store_gateway.zone_aware_replication.enabled=true.
   affinity: {}
 
   # -- topologySpreadConstraints allows to customize part of the default topologySpreadConstraints. labelSelectors
