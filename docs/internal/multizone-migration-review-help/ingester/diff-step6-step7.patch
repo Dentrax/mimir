@@ -1,6 +1,6 @@
 diff -c -r step6/mimir-distributed/templates/distributor/distributor-dep.yaml step7/mimir-distributed/templates/distributor/distributor-dep.yaml
-*** step6/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:54:48.124160357 +0200
---- step7/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:54:58.576204758 +0200
+*** step6/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 10:01:36.023120962 +0200
+--- step7/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 10:01:46.811225540 +0200
 ***************
 *** 48,54 ****
               - "-target=distributor"
@@ -12,8 +12,8 @@ diff -c -r step6/mimir-distributed/templates/distributor/distributor-dep.yaml st
                 mountPath: /etc/mimir
 --- 48,53 ----
 diff -c -r step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml step7/mimir-distributed/templates/ingester/ingester-statefulset.yaml
-*** step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:48.120160341 +0200
---- step7/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:58.572204741 +0200
+*** step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 10:01:36.019120923 +0200
+--- step7/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 10:01:46.807225501 +0200
 ***************
 *** 3,127 ****
   apiVersion: apps/v1
@@ -143,8 +143,8 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
       app.kubernetes.io/name: mimir
 --- 3,8 ----
 diff -c -r step6/mimir-distributed/templates/ingester/ingester-svc.yaml step7/mimir-distributed/templates/ingester/ingester-svc.yaml
-*** step6/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:54:48.120160341 +0200
---- step7/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:54:58.572204741 +0200
+*** step6/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 10:01:36.019120923 +0200
+--- step7/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 10:01:46.807225501 +0200
 ***************
 *** 3,38 ****
   apiVersion: v1
@@ -215,8 +215,8 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-svc.yaml step7/mi
     namespace: "default"
 --- 83,88 ----
 diff -c -r step6/mimir-distributed/templates/ruler/ruler-dep.yaml step7/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step6/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:54:48.116160324 +0200
---- step7/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:54:58.572204741 +0200
+*** step6/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:01:36.015120885 +0200
+--- step7/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:01:46.807225501 +0200
 ***************
 *** 48,54 ****
               - "-target=ruler"

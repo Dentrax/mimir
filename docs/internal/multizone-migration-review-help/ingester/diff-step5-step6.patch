@@ -1,6 +1,6 @@
 diff -c -r step5/mimir-distributed/templates/ingester/ingester-statefulset.yaml step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml
-*** step5/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:37.108115877 +0200
---- step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:48.120160341 +0200
+*** step5/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 10:01:24.967014851 +0200
+--- step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 10:01:36.019120923 +0200
 ***************
 *** 15,21 ****
     namespace: "default"

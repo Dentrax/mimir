@@ -1,7 +1,7 @@
 Only in step1/mimir-distributed/charts: rollout_operator
 diff -c -r step0/mimir-distributed/templates/distributor/distributor-dep.yaml step1/mimir-distributed/templates/distributor/distributor-dep.yaml
-*** step0/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:53:42.299931702 +0200
---- step1/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:53:52.895962310 +0200
+*** step0/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 10:00:29.962503791 +0200
+--- step1/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 10:00:41.030604291 +0200
 ***************
 *** 48,53 ****
 --- 48,54 ----
@@ -13,8 +13,8 @@ diff -c -r step0/mimir-distributed/templates/distributor/distributor-dep.yaml st
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml
-*** step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:53:42.295931690 +0200
---- step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:53:52.891962298 +0200
+*** step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 10:00:29.958503755 +0200
+--- step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 10:00:41.026604254 +0200
 ***************
 *** 83,88 ****
 --- 83,465 ----
@@ -402,8 +402,8 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ingester/ingester-svc.yaml step1/mimir-distributed/templates/ingester/ingester-svc.yaml
-*** step0/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:53:42.295931690 +0200
---- step1/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:53:52.891962298 +0200
+*** step0/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 10:00:29.958503755 +0200
+--- step1/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 10:00:41.026604254 +0200
 ***************
 *** 28,30 ****
 --- 28,138 ----
@@ -519,11 +519,11 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-svc.yaml step1/mi
 +     rollout-group: ingester
 +     zone: zone-c
 diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distributed/templates/mimir-config.yaml
-*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:53:42.295931690 +0200
---- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:53:52.887962286 +0200
+*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-14 10:00:29.954503719 +0200
+--- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-14 10:00:41.022604218 +0200
 ***************
-*** 55,60 ****
---- 55,61 ----
+*** 53,58 ****
+--- 53,59 ----
           num_tokens: 512
           tokens_file_path: /data/tokens
           unregister_on_shutdown: false
@@ -532,8 +532,8 @@ diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distr
         grpc_client_config:
           max_recv_msg_size: 104857600
 diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimir-distributed/templates/querier/querier-dep.yaml
-*** step0/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:53:42.295931690 +0200
---- step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:53:52.891962298 +0200
+*** step0/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:00:29.954503719 +0200
+--- step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:00:41.022604218 +0200
 ***************
 *** 47,52 ****
 --- 47,53 ----
@@ -545,8 +545,8 @@ diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimi
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ruler/ruler-dep.yaml step1/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:53:42.295931690 +0200
---- step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:53:52.887962286 +0200
+*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:00:29.954503719 +0200
+--- step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:00:41.022604218 +0200
 ***************
 *** 48,53 ****
 --- 48,54 ----

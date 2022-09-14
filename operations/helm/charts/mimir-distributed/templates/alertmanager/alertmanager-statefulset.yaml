@@ -112,6 +112,10 @@ spec:
             - "-config.file=/etc/mimir/mimir.yaml"
             {{- if $zoneName }}
             - "-alertmanager.sharding-ring.instance-availability-zone={{ $zoneName }}"
+            {{- else }}
+              {{- if .Values.alertmanager.zone_aware_replication.enabled }}
+            - "-alertmanager.sharding-ring.instance-availability-zone=zone-default"
+              {{- end }}
             {{- end }}
             {{- range $key, $value := .Values.alertmanager.extraArgs }}
             - "-{{ $key }}={{ $value }}"

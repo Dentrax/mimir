@@ -1,6 +1,6 @@
 diff -c -r step4/mimir-distributed/templates/distributor/distributor-dep.yaml step5/mimir-distributed/templates/distributor/distributor-dep.yaml
-*** step4/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:54:26.004073496 +0200
---- step5/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:54:37.112115892 +0200
+*** step4/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 10:01:13.958910294 +0200
+--- step5/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 10:01:24.967014851 +0200
 ***************
 *** 48,53 ****
 --- 48,54 ----
@@ -12,8 +12,8 @@ diff -c -r step4/mimir-distributed/templates/distributor/distributor-dep.yaml st
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step4/mimir-distributed/templates/ruler/ruler-dep.yaml step5/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step4/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:54:25.996073466 +0200
---- step5/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:54:37.108115877 +0200
+*** step4/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:01:13.954910256 +0200
+--- step5/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:01:24.963014812 +0200
 ***************
 *** 48,53 ****
 --- 48,54 ----

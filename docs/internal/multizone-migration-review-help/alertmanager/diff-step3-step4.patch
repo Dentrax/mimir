@@ -1,8 +1,8 @@
 diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
-*** step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:53:21.839879714 +0200
---- step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:53:32.611905901 +0200
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 10:00:09.506321302 +0200
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 10:00:20.250416616 +0200
 ***************
-*** 3,127 ****
+*** 3,128 ****
   apiVersion: apps/v1
   kind: StatefulSet
   metadata:
@@ -86,6 +86,7 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefuls
 -             - "-target=alertmanager"
 -             - "-config.expand-env=true"
 -             - "-config.file=/etc/mimir/mimir.yaml"
+-             - "-alertmanager.sharding-ring.instance-availability-zone=zone-default"
 -           volumeMounts:
 -             - name: config
 -               mountPath: /etc/mimir
@@ -130,8 +131,8 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefuls
       app.kubernetes.io/name: mimir
 --- 3,8 ----
 diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
-*** step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 09:53:21.839879714 +0200
---- step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 09:53:32.611905901 +0200
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 10:00:09.502321267 +0200
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 10:00:20.250416616 +0200
 ***************
 *** 3,38 ****
   apiVersion: v1

@@ -1,6 +1,6 @@
 diff -c -r step1/mimir-distributed/templates/querier/querier-dep.yaml step2/mimir-distributed/templates/querier/querier-dep.yaml
-*** step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:55:19.340299134 +0200
---- step2/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:55:30.372352527 +0200
+*** step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:02:07.779431657 +0200
+--- step2/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:02:18.879542255 +0200
 ***************
 *** 47,54 ****
               - "-target=querier"
@@ -13,8 +13,8 @@ diff -c -r step1/mimir-distributed/templates/querier/querier-dep.yaml step2/mimi
                 mountPath: /etc/mimir
 --- 47,52 ----
 diff -c -r step1/mimir-distributed/templates/ruler/ruler-dep.yaml step2/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:55:19.336299116 +0200
---- step2/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:55:30.372352527 +0200
+*** step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:02:07.775431617 +0200
+--- step2/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:02:18.879542255 +0200
 ***************
 *** 48,55 ****
               - "-target=ruler"

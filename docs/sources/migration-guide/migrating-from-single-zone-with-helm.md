@@ -183,11 +183,10 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    ```yaml
    alertmanager:
      ...
+     {{- if .Values.alertmanager.zone_aware_replication.enabled }}
      sharding_ring:
-       instance_availability_zone: default  # required due to bug in code which requires this field even if target is not the alertmanager
-       {{- if .Values.alertmanager.zone_aware_replication.enabled }}
        zone_awareness_enabled: true
-       {{- end }}
+     {{- end }}
    ```
 
    If in doubt, set the following values:
@@ -197,7 +196,6 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
      structuredConfig:
        alertmanager:
          sharding_ring:
-           instance_availability_zone: default
            zone_awareness_enabled: true
    ```
 

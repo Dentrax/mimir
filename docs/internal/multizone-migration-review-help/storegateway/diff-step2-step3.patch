@@ -1,6 +1,6 @@
 diff -c -r step2/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml step3/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml
-*** step2/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 09:55:30.376352547 +0200
---- step3/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 09:55:41.280407475 +0200
+*** step2/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 10:02:18.883542295 +0200
+--- step3/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 10:02:29.987653932 +0200
 ***************
 *** 14,20 ****
       {}

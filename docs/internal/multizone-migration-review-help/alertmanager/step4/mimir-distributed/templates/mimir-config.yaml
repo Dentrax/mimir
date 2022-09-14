@@ -19,7 +19,6 @@ data:
       enable_api: true
       external_url: /alertmanager
       sharding_ring:
-        instance_availability_zone: default
         zone_awareness_enabled: true
     alertmanager_storage:
       backend: s3

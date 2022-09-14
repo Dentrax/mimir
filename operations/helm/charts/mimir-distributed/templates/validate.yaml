@@ -207,10 +207,6 @@
 {{- fail "You have set alertmanager.zone_aware_replication.enabled=true. The mimir.config must include alertmanager.sharding_ring.zone_awareness_enabled=true. Please merge the latest mimir.config from the chart with your mimir.config."}}
 {{- end -}}
 
-{{- if and .Values.alertmanager.zone_aware_replication.migration.enabled (ne ((($calculatedConfig).alertmanager).sharding_ring).instance_availability_zone "default") -}}
-{{- fail "You have set alertmanager.zone_aware_replication.migration.enabled=true. The mimir.config must include alertmanager.sharding_ring.instance_availability_zone=default. Please merge the latest mimir.config from the chart with your mimir.config."}}
-{{- end -}}
-
 {{- if and .Values.alertmanager.zone_aware_replication.migration.enabled (not .Values.alertmanager.zone_aware_replication.enabled) -}}
 {{- fail "You have set alertmanager.zone_aware_replication.migration.enabled=true, but alertmanager.zone_aware_replication.enabled=false. Please consult the Migrating from single zone with Helm document."}}
 {{- end -}}

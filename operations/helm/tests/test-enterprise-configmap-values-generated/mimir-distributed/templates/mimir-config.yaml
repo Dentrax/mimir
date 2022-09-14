@@ -33,8 +33,6 @@ data:
       data_dir: /data
       enable_api: true
       external_url: /alertmanager
-      sharding_ring:
-        instance_availability_zone: default
     alertmanager_storage:
       backend: s3
       s3:
