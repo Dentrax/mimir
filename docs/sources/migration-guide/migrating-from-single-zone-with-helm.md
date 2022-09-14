@@ -618,6 +618,15 @@ There are two ways to do the migration:
 
    Explanation: while new ingesters are being added, some series will start to be written to new ingesters, however the series will also exist on old ingesters, thus the series will count twice towards limits. Not updating the limits might lead to writes to be refused due to limits violation.
 
+   The `limits.max_global_series_per_user` Mimir configuration parameter has a non-zero default value of 150000. Double the default or your value by setting:
+
+   ```yaml
+   mimir:
+     structuredConfig:
+       limits:
+         max_global_series_per_user: 300000 # <-- or your value doubled
+   ```
+
    If you have set the Mimir configuration parameter `ingester.instance_limits.max_series` via `mimir.config` or `mimir.structuredConfig` or via runtime overrides, double it for the duration of the migration.
 
    If you have set per tenant limits in the Mimir configuration parameters `limits.max_global_series_per_user`, `limits.max_global_series_per_metric` via `mimir.config` or `mimir.sturcturedConfig` or via runtime overrides, double the set limits. For example:
