@@ -33,8 +33,21 @@ This section is about planning and configuring the availability zones defined in
 
 There are two use cases in general:
 
-1. Speeding up rollout of alertmanagers. In this case the default value for `alertmanager.zoneAwareReplication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node.
-1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
+1. Speeding up rollout of alertmanagers. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node:
+   ```yaml
+   alertmanager:
+     zoneAwareReplication:
+       enabled: false # Do not turn on zone awareness without migration because of potential query errors
+       zones:
+       - name: zone-a
+         topologyKey: 'kubernetes.io/hostname'
+       - name: zone-b
+         topologyKey: 'kubernetes.io/hostname'
+       - name: zone-c
+         topologyKey: 'kubernetes.io/hostname'
+   ```
+
+1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. Setting `topologyKey` will instruct the Helm chart to create anti-affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node. For example:
    ```yaml
    alertmanager:
      zoneAwareReplication:
@@ -43,54 +56,15 @@ There are two use cases in general:
          - name: zone-a
            nodeSelector:
              topology.kubernetes.io/zone: zone-a
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - alertmanager
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - alertmanager-zone-a # <-- zone-a comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
              topology.kubernetes.io/zone: zone-b
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - alertmanager
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - alertmanager-zone-b # <-- zone-b comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
              topology.kubernetes.io/zone: zone-c
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - alertmanager
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - alertmanager-zone-c # <-- zone-c comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
    ```
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
@@ -217,8 +191,21 @@ This section is about planning and configuring the availability zones defined in
 
 There are two use cases in general:
 
-1. Speeding up rollout of store gateways. In this case the default value for `store_gateway.zoneAwareReplication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that store gateways from different zones do not mix, but it allows multiple store gateways of the same zone on the same node.
-1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
+1. Speeding up rollout of store-gateways. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that store-gateways from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node:
+   ```yaml
+   store_gateway:
+     zoneAwareReplication:
+       enabled: false # Do not turn on zone awareness without migration because of potential query errors
+       zones:
+       - name: zone-a
+         topologyKey: 'kubernetes.io/hostname'
+       - name: zone-b
+         topologyKey: 'kubernetes.io/hostname'
+       - name: zone-c
+         topologyKey: 'kubernetes.io/hostname'
+   ```
+
+1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. Setting `topologyKey` will instruct the Helm chart to create anti-affinity rules so that store-gateways from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node. For example:
    ```yaml
    store_gateway:
      zoneAwareReplication:
@@ -227,54 +214,15 @@ There are two use cases in general:
          - name: zone-a
            nodeSelector:
              topology.kubernetes.io/zone: zone-a
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - store-gateway
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - store-gateway-zone-a # <-- zone-a comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
              topology.kubernetes.io/zone: zone-b
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - store-gateway
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - store-gateway-zone-b # <-- zone-b comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
              topology.kubernetes.io/zone: zone-c
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - store-gateway
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - store-gateway-zone-c # <-- zone-c comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
    ```
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
@@ -510,64 +458,38 @@ This section is about planning and configuring the availability zones defined in
 
 There are two use cases in general:
 
-1. Speeding up rollout of ingesters. In this case the default value for `ingester.zoneAwareReplication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node.
-1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
+1. Speeding up rollout of ingesters. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node:
    ```yaml
    ingester:
      zoneAwareReplication:
-       enabled: false # Do not turn on zone awareness without migration because of data loss
+       enabled: false # Do not turn on zone awareness without migration because of potential query errors
+       zones:
+       - name: zone-a
+         topologyKey: 'kubernetes.io/hostname'
+       - name: zone-b
+         topologyKey: 'kubernetes.io/hostname'
+       - name: zone-c
+         topologyKey: 'kubernetes.io/hostname'
+   ```
+
+1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. Setting `topologyKey` will instruct the Helm chart to create anti-affinity rules so that store-gateways from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node. For example:
+   ```yaml
+   ingester:
+     zoneAwareReplication:
+       enabled: false # Do not turn on zone awareness without migration because of potential query errors
        zones:
          - name: zone-a
            nodeSelector:
              topology.kubernetes.io/zone: zone-a
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - ingester
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - ingester-zone-a # <-- zone-a comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
              topology.kubernetes.io/zone: zone-b
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - ingester
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - ingester-zone-b # <-- zone-b comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
              topology.kubernetes.io/zone: zone-c
-           affinity:
-             podAntiAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                     matchExpressions:
-                       - key: rollout-group
-                         operator: In
-                         values:
-                           - ingester
-                       - key: app.kubernetes.io/component
-                         operator: NotIn
-                         values:
-                           - ingester-zone-c # <-- zone-c comes from the name of the zone
-                   topologyKey: "kubernetes.io/hostname"
+           topologyKey: "kubernetes.io/hostname"
    ```
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).

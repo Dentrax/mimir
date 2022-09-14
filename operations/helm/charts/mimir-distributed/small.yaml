@@ -26,6 +26,14 @@ alertmanager:
       memory: 6Gi
   statefulSet:
     enabled: true
+  zoneAwareReplication:
+    zones:
+    - name: zone-a
+      topologyKey: 'kubernetes.io/hostname'
+    - name: zone-b
+      topologyKey: 'kubernetes.io/hostname'
+    - name: zone-c
+      topologyKey: 'kubernetes.io/hostname'
 
 compactor:
   persistentVolume:
