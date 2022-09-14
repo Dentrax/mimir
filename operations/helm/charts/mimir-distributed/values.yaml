@@ -351,6 +351,9 @@ rbac:
 alertmanager:
   enabled: true
   # -- Total number of replicas for the alertmanager accross all availability zones
+  # If 'alertmanager.zoneAwareReplication.enabled' is false, this number is taken as is.
+  # Otherwise each zone starts 'replicas' / (number of zones) rounded up to the nearest integer number of pods.
+  #   E.g. if 'replicas' is set to 4 and there are 3 zones, then 4/3=1.33 and after rounding up it means 2 pods per zone are started.
   replicas: 1
 
   statefulSet:
@@ -624,6 +627,9 @@ distributor:
 
 ingester:
   # -- Total number of replicas for the ingester accross all availability zones
+  # If 'ingester.zoneAwareReplication.enabled' is false, this number is taken as is.
+  # Otherwise each zone starts 'replicas' / (number of zones) rounded up to the nearest integer number of pods.
+  #   E.g. if 'replicas' is set to 4 and there are 3 zones, then 4/3=1.33 and after rounding up it means 2 pods per zone are started.
   replicas: 3
 
   statefulSet:
@@ -1152,6 +1158,9 @@ query_scheduler:
 
 store_gateway:
   # -- Total number of replicas for the store-gateway accross all availability zones
+  # If 'store_gateway.zoneAwareReplication.enabled' is false, this number is taken as is.
+  # Otherwise each zone starts 'replicas' / (number of zones) rounded up to the nearest integer number of pods.
+  #   E.g. if 'replicas' is set to 4 and there are 3 zones, then 4/3=1.33 and after rounding up it means 2 pods per zone are started.
   replicas: 1
 
   service:
