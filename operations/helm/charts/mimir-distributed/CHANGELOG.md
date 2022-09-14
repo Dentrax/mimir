@@ -25,6 +25,43 @@ Entries should include a reference to the Pull Request that introduced the chang
 
 ## main / unreleased
 
+* [CHANGE] **breaking change** **Data loss without action.** Enable [zone aware replication](https://grafana.com/docs/mimir/latest/operators-guide/configure/configuring-zone-aware-replication/) for ingesters and store-gateways by default. #2778
+  - If you are **installing** the chart:
+    - If there are more then 3 nodes in the cluster, no action is needed
+    - If there are 3 or less nodes in the cluster, you should relax the affinity rules in `ingester.zone_aware_replication.zones` and `store_gateway.zone_aware_replication.zones`. The simplest would be to set each to `{}`, for example:
+      ```yaml
+      ingester:
+        zone_aware_replication:
+          zones:
+            - name: zone-a
+              affinity: {}
+            - name: zone-b
+              affinity: {}
+            - name: zone-c
+              affinity: {}
+      store_gateway:
+        zone_aware_replication:
+          zones:
+            - name: zone-a
+              affinity: {}
+            - name: zone-b
+              affinity: {}
+            - name: zone-c
+              affinity: {}
+      ```
+  - If you are **upgrading** an existing installation:
+    - Turn off zone aware replication, by setting the following values:
+      ```yaml
+      ingester:
+        zone_aware_replication:
+          enabled: false
+      store_gateway:
+        zone_aware_replication:
+          enabled: false
+      rollout_operator:
+        enabled: false
+      ```
+    - After the upgrade you can migrate to the new zone aware replication setup, see [Migrate from single zone to zone aware replication with Helm](https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm/) guide.
 * [CHANGE] Nginx: replace topology key previously used in `podAntiAffinity` (`failure-domain.beta.kubernetes.io/zone`) with a different one `topologySpreadConstraints` (`kubernetes.io/hostname`). #2722
 * [CHANGE] Use `topologySpreadConstraints` instead of `podAntiAffinity` by default. #2722
 * [CHANGE] Ingresses for the GEM gateway and nginx will no longer render on Kubernetes versions <1.19. #2872

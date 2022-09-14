@@ -715,7 +715,7 @@ ingester:
   extraEnvFrom: []
 
   zone_aware_replication:
-    enabled: false
+    enabled: true
     max_unavailable: 25
     zones:
     - name: zone-a
@@ -1215,7 +1215,7 @@ store_gateway:
   extraEnvFrom: []
 
   zone_aware_replication:
-    enabled: false
+    enabled: true
     max_unavailable: 10
     zones:
     - name: zone-a
@@ -1681,7 +1681,7 @@ results-cache:
 
 # -- Setting for the Grafana Rollout Operator https://github.com/grafana/helm-charts/tree/main/charts/rollout-operator
 rollout_operator:
-  enabled: false
+  enabled: true
 
 minio:
   enabled: true

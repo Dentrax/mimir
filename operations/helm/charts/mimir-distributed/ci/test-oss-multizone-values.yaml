@@ -25,7 +25,6 @@ ingester:
   persistentVolume:
     enabled: false
   zone_aware_replication:
-    enabled: true
     zones:
       - name: zone-a
         affinity: {}
@@ -39,6 +38,8 @@ store_gateway:
     <<: *ci_resources
   persistentVolume:
     enabled: false
+  zone_aware_replication:
+    enabled: false
 
 querier:
   resources:
@@ -51,6 +52,3 @@ query_frontend:
 query_scheduler:
   resources:
     <<: *ci_resources
-
-rollout_operator:
-  enabled: true
