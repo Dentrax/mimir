@@ -1,6 +1,6 @@
 diff -c -r step3/mimir-distributed/templates/querier/querier-dep.yaml step4/mimir-distributed/templates/querier/querier-dep.yaml
-*** step3/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:01:03.130808536 +0200
---- step4/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:01:13.954910256 +0200
+*** step3/mimir-distributed/templates/querier/querier-dep.yaml
+--- step4/mimir-distributed/templates/querier/querier-dep.yaml
 ***************
 *** 47,53 ****
               - "-target=querier"

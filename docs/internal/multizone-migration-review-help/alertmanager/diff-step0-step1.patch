@@ -1,7 +1,7 @@
 Only in step1/mimir-distributed/charts: rollout_operator
 diff -c -r step0/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
-*** step0/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:59:36.566036699 +0200
---- step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:59:47.582130571 +0200
+*** step0/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+--- step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
 ***************
 *** 83,88 ****
 --- 83,473 ----
@@ -397,8 +397,8 @@ diff -c -r step0/mimir-distributed/templates/alertmanager/alertmanager-statefuls
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml step1/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
-*** step0/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 09:59:36.566036699 +0200
---- step1/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 09:59:47.578130537 +0200
+*** step0/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
+--- step1/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
 ***************
 *** 28,30 ****
 --- 28,138 ----
@@ -514,8 +514,8 @@ diff -c -r step0/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml 
 +     rollout-group: alertmanager
 +     zone: zone-c
 diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distributed/templates/mimir-config.yaml
-*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:59:36.566036699 +0200
---- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:59:47.578130537 +0200
+*** step0/mimir-distributed/templates/mimir-config.yaml
+--- step1/mimir-distributed/templates/mimir-config.yaml
 ***************
 *** 18,23 ****
 --- 18,25 ----

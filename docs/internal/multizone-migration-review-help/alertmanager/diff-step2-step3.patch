@@ -1,6 +1,6 @@
 diff -c -r step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
-*** step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:59:58.574225557 +0200
---- step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 10:00:09.506321302 +0200
+*** step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+--- step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
 ***************
 *** 14,20 ****
       {}

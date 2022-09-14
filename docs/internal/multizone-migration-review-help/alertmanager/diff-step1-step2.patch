@@ -1,6 +1,6 @@
 diff -c -r step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
-*** step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:59:47.582130571 +0200
---- step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:59:58.574225557 +0200
+*** step1/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+--- step2/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
 ***************
 *** 137,143 ****
       rollout-max-unavailable: "2"

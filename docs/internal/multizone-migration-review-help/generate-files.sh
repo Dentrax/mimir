@@ -4,11 +4,22 @@ python3 extract-yamls.py ../../sources/migration-guide/migrating-from-single-zon
 
 SED="sed"
 
+function write_template {
+  local step_dir="$1"
+  local step_yaml="$2"
+
+  rm -rf "${step_dir}"
+  if [ -n "${step_yaml}" ] ; then
+    helm template krajo ../../../../operations/helm/charts/mimir-distributed --output-dir "${step_dir}" -f ../base.yaml -f "${step_yaml}"
+  else
+    helm template krajo ../../../../operations/helm/charts/mimir-distributed --output-dir "${step_dir}" -f ../base.yaml
+  fi
+  find "${step_dir}" -type f -print0 | xargs -0 "${SED}" -E -i -- "/^\s+(checksum\/config|(helm.sh\/)?chart|app.kubernetes.io\/version|image: \"grafana\/(mimir|mimir-continuous-test|enterprise-metrics)):/d"
+}
+
 for component in alertmanager ingester storegateway ; do
   pushd "${component}"
-  rm -rf step0
-  helm template krajo ../../../../operations/helm/charts/mimir-distributed --output-dir step0 -f ../base.yaml
-  find step0 -type f -print0 | xargs -0 "${SED}" -E -i -- "/^\s+(checksum\/config|(helm.sh\/)?chart|app.kubernetes.io\/version|image: \"grafana\/(mimir|mimir-continuous-test|enterprise-metrics)):/d"
+  write_template "step0"
   i=1
   while [ -e "${component}-step${i}.yaml" ] ; do
     step_yaml="${component}-step${i}.yaml"
@@ -18,9 +29,10 @@ for component in alertmanager ingester storegateway ; do
     echo "Component=${component} Prev step=${prev_dir} Current step=${step_dir}"
     rm -rf "${step_dir}"
     ${SED} -i "s/<N>/3/g" "${step_yaml}"
-    helm template krajo ../../../../operations/helm/charts/mimir-distributed --output-dir "${step_dir}" -f ../base.yaml -f "${step_yaml}"
-    find "${step_dir}" -type f -print0 | xargs -0 "${SED}" -E -i -- "/^\s+(checksum\/config|(helm.sh\/)?chart|app.kubernetes.io\/version|image: \"grafana\/(mimir|mimir-continuous-test|enterprise-metrics)):/d"
-    diff -c -r "${prev_dir}" "${step_dir}" > "diff-${prev_dir}-${step_dir}.patch"
+    write_template "${step_dir}" "${step_yaml}"
+    diff_filename="diff-${prev_dir}-${step_dir}.patch"
+    diff -c -r "${prev_dir}" "${step_dir}" > "${diff_filename}"
+    "${SED}" -E -i -- 's/^((\*\*\*|---) .*yaml).*/\1/g' ${diff_filename}
     ((i++))
   done
   popd

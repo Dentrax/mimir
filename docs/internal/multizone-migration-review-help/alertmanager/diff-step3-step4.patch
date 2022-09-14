@@ -1,6 +1,6 @@
 diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
-*** step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 10:00:09.506321302 +0200
---- step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 10:00:20.250416616 +0200
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
 ***************
 *** 3,128 ****
   apiVersion: apps/v1
@@ -131,8 +131,8 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefuls
       app.kubernetes.io/name: mimir
 --- 3,8 ----
 diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
-*** step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 10:00:09.502321267 +0200
---- step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 10:00:20.250416616 +0200
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
 ***************
 *** 3,38 ****
   apiVersion: v1

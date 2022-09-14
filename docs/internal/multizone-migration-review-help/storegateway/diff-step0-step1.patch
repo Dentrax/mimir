@@ -1,7 +1,7 @@
 Only in step1/mimir-distributed/charts: rollout_operator
 diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distributed/templates/mimir-config.yaml
-*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-14 10:01:56.571321019 +0200
---- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-14 10:02:07.775431617 +0200
+*** step0/mimir-distributed/templates/mimir-config.yaml
+--- step1/mimir-distributed/templates/mimir-config.yaml
 ***************
 *** 89,92 ****
 --- 89,95 ----
@@ -13,8 +13,8 @@ diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distr
           tokens_file_path: /data/tokens
 +         zone_awareness_enabled: true
 diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimir-distributed/templates/querier/querier-dep.yaml
-*** step0/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:01:56.571321019 +0200
---- step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 10:02:07.779431657 +0200
+*** step0/mimir-distributed/templates/querier/querier-dep.yaml
+--- step1/mimir-distributed/templates/querier/querier-dep.yaml
 ***************
 *** 47,52 ****
 --- 47,54 ----
@@ -27,8 +27,8 @@ diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimi
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ruler/ruler-dep.yaml step1/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:01:56.571321019 +0200
---- step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 10:02:07.775431617 +0200
+*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml
+--- step1/mimir-distributed/templates/ruler/ruler-dep.yaml
 ***************
 *** 48,53 ****
 --- 48,55 ----
@@ -41,8 +41,8 @@ diff -c -r step0/mimir-distributed/templates/ruler/ruler-dep.yaml step1/mimir-di
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml step1/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml
-*** step0/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 10:01:56.575321059 +0200
---- step1/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 10:02:07.779431657 +0200
+*** step0/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml
+--- step1/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml
 ***************
 *** 81,86 ****
 --- 81,460 ----
@@ -427,8 +427,8 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml step1/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml
-*** step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml	2022-09-14 10:01:56.575321059 +0200
---- step1/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml	2022-09-14 10:02:07.779431657 +0200
+*** step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml
+--- step1/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml
 ***************
 *** 28,30 ****
 --- 28,138 ----
