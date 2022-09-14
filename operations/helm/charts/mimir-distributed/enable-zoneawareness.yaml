@@ -4,167 +4,44 @@ rollout_operator:
 store_gateway:
   zoneAwareReplication:
     enabled: true
+    topologyKey: 'kubernetes.io/hostname'
     zones:
     - name: zone-a
       nodeSelector:
         topology.kubernetes.io/zone: zone-a
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-a
-              topologyKey: 'kubernetes.io/hostname'
     - name: zone-b
       nodeSelector:
         topology.kubernetes.io/zone: zone-b
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-b
-              topologyKey: 'kubernetes.io/hostname'
     - name: zone-c
       nodeSelector:
         topology.kubernetes.io/zone: zone-c
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-c
-              topologyKey: 'kubernetes.io/hostname'
 
 ingester:
   zoneAwareReplication:
     enabled: true
+    topologyKey: 'kubernetes.io/hostname'
     zones:
     - name: zone-a
       nodeSelector:
         topology.kubernetes.io/zone: zone-a
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-a
-              topologyKey: 'kubernetes.io/hostname'
     - name: zone-b
       nodeSelector:
         topology.kubernetes.io/zone: zone-b
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-b
-              topologyKey: 'kubernetes.io/hostname'
     - name: zone-c
       nodeSelector:
         topology.kubernetes.io/zone: zone-c
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-c
-              topologyKey: 'kubernetes.io/hostname'
 
 alertmanager:
   zoneAwareReplication:
     enabled: true
+    topologyKey: 'kubernetes.io/hostname'
     zones:
     - name: zone-a
       nodeSelector:
         topology.kubernetes.io/zone: zone-a
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-a
-              topologyKey: 'kubernetes.io/hostname'
     - name: zone-b
       nodeSelector:
         topology.kubernetes.io/zone: zone-b
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-b
-              topologyKey: 'kubernetes.io/hostname'
     - name: zone-c
       nodeSelector:
         topology.kubernetes.io/zone: zone-c
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-c
-              topologyKey: 'kubernetes.io/hostname'
