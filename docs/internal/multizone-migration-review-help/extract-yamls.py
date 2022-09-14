@@ -27,6 +27,7 @@ f = open(sys.argv[1], "r")
 
 codeblock = re.compile("\s*```(yaml)?")
 meta = re.compile('\s*\[//\]: # "([^"]+-step\d+)"')
+empty = re.compile('\s*\n')
 state = "init"
 for line in f:
     if state == "init":
@@ -39,11 +40,11 @@ for line in f:
         else:
             stored.append(line)
     elif state == "afterstore":
+        if empty.match(line):
+            continue
         state = "init"
         match = meta.match(line)
         if not match:
             continue
         stepname = match.group(1)
         write_file(stepname, stored)
-
-

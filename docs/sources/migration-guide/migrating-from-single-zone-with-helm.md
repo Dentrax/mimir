@@ -55,7 +55,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - alertmanager-zone-a  # <-- zone-a comes from the name of the zone
+                           - alertmanager-zone-a # <-- zone-a comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
@@ -72,7 +72,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - alertmanager-zone-b  # <-- zone-b comes from the name of the zone
+                           - alertmanager-zone-b # <-- zone-b comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
@@ -89,7 +89,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - alertmanager-zone-c  # <-- zone-c comes from the name of the zone
+                           - alertmanager-zone-c # <-- zone-c comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
    ```
 
@@ -103,7 +103,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 1. Start the migration.
 
-   Copy the following into the `migrate.yaml`:
+   Copy the following into the `migrate.yaml` file:
 
    ```yaml
    alertmanager:
@@ -115,6 +115,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "alertmanager-step1"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -124,6 +125,8 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 1. Wait until all alertmanagers are restarted.
 
 1. Scale up zone aware alertmanagers.
+
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    alertmanager:
@@ -136,6 +139,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "alertmanager-step2"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -144,7 +148,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 1. Scale down old alertmanagers to 0.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    alertmanager:
@@ -158,6 +162,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "alertmanager-step3"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -166,7 +171,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 1. Set the final configuration.
 
-   **Merge** the last values in `migrate.yaml` into your regular `custom.yaml` file:
+   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
 
    ```yaml
    alertmanager:
@@ -176,6 +181,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "alertmanager-step4"
 
    > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
@@ -233,7 +239,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-a  # <-- zone-a comes from the name of the zone
+                           - store-gateway-zone-a # <-- zone-a comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
@@ -250,7 +256,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-b  # <-- zone-b comes from the name of the zone
+                           - store-gateway-zone-b # <-- zone-b comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
@@ -267,7 +273,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - store-gateway-zone-c  # <-- zone-c comes from the name of the zone
+                           - store-gateway-zone-c # <-- zone-c comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
    ```
 
@@ -296,7 +302,7 @@ There are two ways to do the migration:
 
 1. Turn off traffic to the installation.
 
-   Copy the following into the `migrate.yaml`:
+   Copy the following into the `migrate.yaml` file:
 
    ```yaml
    store_gateway:
@@ -315,7 +321,7 @@ There are two ways to do the migration:
 
 1. Scale the current store gateways to 0.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    store_gateway:
@@ -337,7 +343,7 @@ There are two ways to do the migration:
 
    > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for store gateways](#configure-zone-aware-replication-for-store-gateways)
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    store_gateway:
@@ -380,7 +386,7 @@ There are two ways to do the migration:
 
 1. Create the new zone aware store gateways
 
-   Copy the following into the `migrate.yaml`:
+   Copy the following into the `migrate.yaml` file:
 
    ```yaml
    store_gateway:
@@ -392,6 +398,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "storegateway-step1"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -404,7 +411,7 @@ There are two ways to do the migration:
 
 1. Make the read path use the new zone aware store gateways.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    store_gateway:
@@ -417,6 +424,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "storegateway-step2"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -425,7 +433,7 @@ There are two ways to do the migration:
 
 1. Scale down non zone aware store gateways to 0.
 
-1. Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    store_gateway:
@@ -439,6 +447,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "storegateway-step3"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -447,7 +456,7 @@ There are two ways to do the migration:
 
 1. Set the final configuration.
 
-   **Merge** the last values in `migrate.yaml` into your regular `custom.yaml` file:
+   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
 
    ```yaml
    store_gateway:
@@ -457,6 +466,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "storegateway-step4"
 
    These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
@@ -522,7 +532,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - ingester-zone-a  # <-- zone-a comes from the name of the zone
+                           - ingester-zone-a # <-- zone-a comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-b
            nodeSelector:
@@ -539,7 +549,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - ingester-zone-b  # <-- zone-b comes from the name of the zone
+                           - ingester-zone-b # <-- zone-b comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
          - name: zone-c
            nodeSelector:
@@ -556,7 +566,7 @@ There are two use cases in general:
                        - key: app.kubernetes.io/component
                          operator: NotIn
                          values:
-                           - ingester-zone-c  # <-- zone-c comes from the name of the zone
+                           - ingester-zone-c # <-- zone-c comes from the name of the zone
                    topologyKey: "kubernetes.io/hostname"
    ```
 
@@ -585,7 +595,7 @@ There are two ways to do the migration:
 
 1. Enable flushing data from ingesters to storage on shutdown.
 
-   Copy the following into the `migrate.yaml`:
+   Copy the following into the `migrate.yaml` file:
 
    ```yaml
    mimir:
@@ -607,7 +617,7 @@ There are two ways to do the migration:
 
 1. Turn off traffic to the installation.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    mimir:
@@ -634,7 +644,7 @@ There are two ways to do the migration:
 
 1. Scale the current ingesters to 0.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    mimir:
@@ -664,7 +674,7 @@ There are two ways to do the migration:
 
    > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters)
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    ingester:
@@ -727,7 +737,7 @@ There are two ways to do the migration:
 
    > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters)
 
-   Copy the following into the `migrate.yaml`:
+   Copy the following into the `migrate.yaml` file:
 
    ```yaml
    ingester:
@@ -740,6 +750,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "ingester-step1"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -750,7 +761,7 @@ There are two ways to do the migration:
 
 1. Progressively scale zone-aware ingesters up, maximum 21 at a time.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    ingester:
@@ -763,6 +774,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "ingester-step2"
 
    > **Note**: replace `<N>` with the number of replicas in each step until `<N>` reaches the same number as in `ingester.replicas`, do not increase `<N>` with more than 21 in each step.
@@ -777,7 +789,7 @@ There are two ways to do the migration:
 
 1. Enable zone awareness on the write path.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    ingester:
@@ -790,6 +802,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "ingester-step3"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -802,7 +815,7 @@ There are two ways to do the migration:
 
 1. Enable zone awareness on the read path.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    ingester:
@@ -816,6 +829,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "ingester-step4"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -826,7 +840,7 @@ There are two ways to do the migration:
 
 1. Exclude non zone aware ingesters from the write path.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    ingester:
@@ -841,6 +855,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "ingester-step5"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -851,7 +866,7 @@ There are two ways to do the migration:
 
 1. Scale down non zone aware ingesters to 0.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    ingester:
@@ -867,6 +882,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "ingester-step6"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -875,7 +891,7 @@ There are two ways to do the migration:
 
 1. Delete the default zone.
 
-   Copy the following into the `migrate.yaml`:
+   Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
    ingester:
@@ -885,6 +901,7 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
+
    [//]: # "ingester-step7"
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -893,7 +910,7 @@ There are two ways to do the migration:
 
 1. Set the final configuration.
 
-   **Merge** the last values in `migrate.yaml` into your regular `custom.yaml` file:
+   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
 
    ```yaml
    ingester:
