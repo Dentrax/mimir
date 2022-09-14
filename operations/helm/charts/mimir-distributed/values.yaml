@@ -510,51 +510,36 @@ alertmanager:
       scaleDownDefaultZone: false
     # -- Zone definitions for alertmanager zones
     zones:
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-a
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - alertmanager
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - alertmanager-zone-a  # <-- zone-a comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-a
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-b
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - alertmanager
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - alertmanager-zone-b  # <-- zone-b comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-b
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-c
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - alertmanager
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - alertmanager-zone-c  # <-- zone-c comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-c
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
 
 distributor:
   replicas: 1
@@ -763,51 +748,36 @@ ingester:
       writePath: false
     # -- Zone definitions for ingester zones
     zones:
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-a
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - ingester
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - ingester-zone-a  # <-- zone-a comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-a
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-b
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - ingester
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - ingester-zone-b  # <-- zone-b comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-b
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-c
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - ingester
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - ingester-zone-c  # <-- zone-c comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-c
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
 
 overrides_exporter:
   enabled: true
@@ -1281,51 +1251,36 @@ store_gateway:
       scaleDownDefaultZone: false
     # -- Zone definitions for store-gateway zones
     zones:
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-a
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-a  # <-- zone-a comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-a
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-b
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-b  # <-- zone-b comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-b
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
+    # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     - name: zone-c
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: rollout-group
-                    operator: In
-                    values:
-                      - store-gateway
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - store-gateway-zone-c  # <-- zone-c comes from the name of the zone
-              topologyKey: 'kubernetes.io/hostname'
+      # -- nodeselector to restrict where pods of this zone can be placed. E.g.:
+      # nodeSelector:
+      #   topology.kubernetes.io/zone: zone-c
+      nodeSelector: null
+      # -- topologyKey to use in pod anti-affinity. If unset, no anti-affinity rules are generated. If set, the generated anti-affinity rule makes sure that pods from different zones do not mix.
+      topologyKey: null
+      # -- extraAffinity adds user defined custom affinity rules (merged onto generated rules)
+      extraAffinity: {}
 
 compactor:
   replicas: 1

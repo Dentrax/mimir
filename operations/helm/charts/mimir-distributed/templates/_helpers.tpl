@@ -464,7 +464,7 @@ Params:
 {{- end -}}
 {{- range $idx, $rolloutZone := $componentSection.zoneAwareReplication.zones -}}
 {{- $_ := set $zonesMap $rolloutZone.name (dict
-  "affinity" ($rolloutZone.affinity | default (dict))
+  "affinity" (($rolloutZone.extraAffinity | default (dict)) | mergeOverwrite (include "mimir.zoneAntiAffinity" (dict "component" $.component "rolloutZoneName" $rolloutZone.name "topologyKey" $rolloutZone.topologyKey ) | fromYaml ) )
   "nodeSelector" ($rolloutZone.nodeSelector | default (dict) )
   "replicas" $replicaPerZone
   ) -}}
@@ -481,6 +481,33 @@ Params:
 {{- end -}}
 {{- $zonesMap | toYaml }}
 
+{{- end -}}
+
+{{/*
+Calculate anti-affinity for a zone
+Params:
+  component = component name
+  rolloutZoneName = name of the rollout zone
+  topologyKey = topology key
+*/}}
+{{- define "mimir.zoneAntiAffinity" -}}
+{{- if .topologyKey -}}
+podAntiAffinity:
+  requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+          - key: rollout-group
+            operator: In
+            values:
+              - {{ .component }}
+          - key: app.kubernetes.io/component
+            operator: NotIn
+            values:
+              - {{ .component }}-{{ .rolloutZoneName }}
+      topologyKey: {{ .topologyKey | quote }}
+{{- else -}}
+{}
+{{- end -}}
 {{- end -}}
 
 {{/*

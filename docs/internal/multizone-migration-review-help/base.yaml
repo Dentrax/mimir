@@ -1,33 +1,12 @@
 alertmanager:
   zoneAwareReplication:
     enabled: false
-    zones:
-      - name: zone-a
-        affinity: {}
-      - name: zone-b
-        affinity: {}
-      - name: zone-c
-        affinity: {}
 ingester:
   zoneAwareReplication:
     enabled: false
-    zones:
-      - name: zone-a
-        affinity: {}
-      - name: zone-b
-        affinity: {}
-      - name: zone-c
-        affinity: {}
 store_gateway:
   zoneAwareReplication:
     enabled: false
-    zones:
-      - name: zone-a
-        affinity: {}
-      - name: zone-b
-        affinity: {}
-      - name: zone-c
-        affinity: {}
 rollout_operator:
   enabled: false
 

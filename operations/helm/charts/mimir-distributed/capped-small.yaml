@@ -60,16 +60,14 @@ ingester:
     limits:
       cpu: 4
       memory: 15Gi
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-              - key: target
-                operator: In
-                values:
-                  - ingester
-          topologyKey: 'kubernetes.io/hostname'
+  zoneAwareReplication:
+    zones:
+    - name: zone-a
+      topologyKey: 'kubernetes.io/hostname'
+    - name: zone-b
+      topologyKey: 'kubernetes.io/hostname'
+    - name: zone-c
+      topologyKey: 'kubernetes.io/hostname'
 
 chunks-cache:
   enabled: true
@@ -139,6 +137,14 @@ store_gateway:
     limits:
       cpu: 1
       memory: 6Gi
+  zoneAwareReplication:
+    zones:
+    - name: zone-a
+      topologyKey: 'kubernetes.io/hostname'
+    - name: zone-b
+      topologyKey: 'kubernetes.io/hostname'
+    - name: zone-c
+      topologyKey: 'kubernetes.io/hostname'
 
 # Grafana Enterprise Metrics feature related
 admin_api:
