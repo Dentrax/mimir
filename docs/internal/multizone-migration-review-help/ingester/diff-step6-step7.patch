@@ -1,8 +1,8 @@
 diff -c -r step6/mimir-distributed/templates/distributor/distributor-dep.yaml step7/mimir-distributed/templates/distributor/distributor-dep.yaml
-*** step6/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-13 08:14:56.626324791 +0200
---- step7/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-13 08:15:05.690176016 +0200
+*** step6/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:54:48.124160357 +0200
+--- step7/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:54:58.576204758 +0200
 ***************
-*** 53,59 ****
+*** 48,54 ****
               - "-target=distributor"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
@@ -10,23 +10,21 @@ diff -c -r step6/mimir-distributed/templates/distributor/distributor-dep.yaml st
             volumeMounts:
               - name: config
                 mountPath: /etc/mimir
---- 53,58 ----
+--- 48,53 ----
 diff -c -r step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml step7/mimir-distributed/templates/ingester/ingester-statefulset.yaml
-*** step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:14:56.622324853 +0200
---- step7/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:15:05.686176084 +0200
+*** step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:48.120160341 +0200
+--- step7/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:58.572204741 +0200
 ***************
-*** 3,123 ****
+*** 3,127 ****
   apiVersion: apps/v1
   kind: StatefulSet
   metadata:
 -   name: krajo-mimir-ingester
 -   labels:
--     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 -     app.kubernetes.io/name: mimir
 -     app.kubernetes.io/instance: krajo
 -     app.kubernetes.io/component: ingester
 -     app.kubernetes.io/part-of: memberlist
--     app.kubernetes.io/version: "r202"
 -     app.kubernetes.io/managed-by: Helm
 -   annotations:
 -     {}
@@ -54,10 +52,8 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 -   template:
 -     metadata:
 -       labels:
--         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 -         app.kubernetes.io/name: mimir
 -         app.kubernetes.io/instance: krajo
--         app.kubernetes.io/version: "r202"
 -         app.kubernetes.io/managed-by: Helm
 -         app.kubernetes.io/component: ingester
 -         app.kubernetes.io/part-of: memberlist
@@ -73,6 +69,15 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 -         {}
 -       affinity:
 -         {}
+-       topologySpreadConstraints:
+-         - maxSkew: 1
+-           topologyKey: kubernetes.io/hostname
+-           whenUnsatisfiable: ScheduleAnyway
+-           labelSelector:
+-             matchLabels:
+-               app.kubernetes.io/name: mimir
+-               app.kubernetes.io/instance: krajo
+-               app.kubernetes.io/component: ingester
 -       tolerations:
 -         []
 -       terminationGracePeriodSeconds: 240
@@ -88,7 +93,6 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 -             name: krajo-mimir-runtime
 -       containers:
 -         - name: ingester
--           image: "grafana/mimir:r202-d1db3dc"
 -           imagePullPolicy: IfNotPresent
 -           args:
 -             - "-target=ingester"
@@ -136,24 +140,22 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 - metadata:
     name: krajo-mimir-ingester-zone-a
     labels:
-      helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+      app.kubernetes.io/name: mimir
 --- 3,8 ----
 diff -c -r step6/mimir-distributed/templates/ingester/ingester-svc.yaml step7/mimir-distributed/templates/ingester/ingester-svc.yaml
-*** step6/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-13 08:14:56.622324853 +0200
---- step7/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-13 08:15:05.686176084 +0200
+*** step6/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:54:48.120160341 +0200
+--- step7/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:54:58.572204741 +0200
 ***************
-*** 3,40 ****
+*** 3,38 ****
   apiVersion: v1
   kind: Service
   metadata:
 -   name: krajo-mimir-ingester
 -   labels:
--     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 -     app.kubernetes.io/name: mimir
 -     app.kubernetes.io/instance: krajo
 -     app.kubernetes.io/component: ingester
 -     app.kubernetes.io/part-of: memberlist
--     app.kubernetes.io/version: "r202"
 -     app.kubernetes.io/managed-by: Helm
 -   annotations:
 -     {}
@@ -180,10 +182,10 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-svc.yaml step7/mi
 - metadata:
     name: krajo-mimir-ingester-zone-a
     labels:
-      helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+      app.kubernetes.io/name: mimir
 --- 3,8 ----
 ***************
-*** 47,53 ****
+*** 43,49 ****
       name: "ingester-zone-a"
       rollout-group: ingester
       zone: zone-a
@@ -191,9 +193,9 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-svc.yaml step7/mi
     annotations:
       {}
     namespace: "default"
---- 15,20 ----
+--- 13,18 ----
 ***************
-*** 85,91 ****
+*** 79,85 ****
       name: "ingester-zone-b"
       rollout-group: ingester
       zone: zone-b
@@ -201,9 +203,9 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-svc.yaml step7/mi
     annotations:
       {}
     namespace: "default"
---- 52,57 ----
+--- 48,53 ----
 ***************
-*** 123,129 ****
+*** 115,121 ****
       name: "ingester-zone-c"
       rollout-group: ingester
       zone: zone-c
@@ -211,12 +213,12 @@ diff -c -r step6/mimir-distributed/templates/ingester/ingester-svc.yaml step7/mi
     annotations:
       {}
     namespace: "default"
---- 89,94 ----
+--- 83,88 ----
 diff -c -r step6/mimir-distributed/templates/ruler/ruler-dep.yaml step7/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step6/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:14:56.622324853 +0200
---- step7/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:15:05.686176084 +0200
+*** step6/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:54:48.116160324 +0200
+--- step7/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:54:58.572204741 +0200
 ***************
-*** 53,59 ****
+*** 48,54 ****
               - "-target=ruler"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
@@ -224,4 +226,4 @@ diff -c -r step6/mimir-distributed/templates/ruler/ruler-dep.yaml step7/mimir-di
             volumeMounts:
               - name: config
                 mountPath: /etc/mimir
---- 53,58 ----
+--- 48,53 ----

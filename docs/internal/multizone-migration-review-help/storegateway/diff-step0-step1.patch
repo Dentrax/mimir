@@ -1,10 +1,10 @@
 Only in step1/mimir-distributed/charts: rollout_operator
 diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distributed/templates/mimir-config.yaml
-*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-13 08:15:13.318040202 +0200
---- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-13 08:15:22.745859830 +0200
+*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:55:08.320248037 +0200
+--- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:55:19.336299116 +0200
 ***************
-*** 93,96 ****
---- 93,99 ----
+*** 91,94 ****
+--- 91,97 ----
         grpc_server_max_connection_idle: 1m
       store_gateway:
         sharding_ring:
@@ -13,11 +13,11 @@ diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distr
           tokens_file_path: /data/tokens
 +         zone_awareness_enabled: true
 diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimir-distributed/templates/querier/querier-dep.yaml
-*** step0/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:15:13.322040129 +0200
---- step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:15:22.749859751 +0200
+*** step0/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:55:08.324248055 +0200
+--- step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:55:19.340299134 +0200
 ***************
-*** 52,57 ****
---- 52,59 ----
+*** 47,52 ****
+--- 47,54 ----
               - "-target=querier"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
@@ -27,11 +27,11 @@ diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimi
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ruler/ruler-dep.yaml step1/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:15:13.318040202 +0200
---- step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:15:22.749859751 +0200
+*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:55:08.320248037 +0200
+--- step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:55:19.336299116 +0200
 ***************
-*** 53,58 ****
---- 53,60 ----
+*** 48,53 ****
+--- 48,55 ----
               - "-target=ruler"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
@@ -41,11 +41,11 @@ diff -c -r step0/mimir-distributed/templates/ruler/ruler-dep.yaml step1/mimir-di
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml step1/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml
-*** step0/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-13 08:15:13.322040129 +0200
---- step1/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-13 08:15:22.749859751 +0200
+*** step0/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 09:55:08.324248055 +0200
+--- step1/mimir-distributed/templates/store-gateway/store-gateway-statefulset.yaml	2022-09-14 09:55:19.340299134 +0200
 ***************
-*** 85,90 ****
---- 85,452 ----
+*** 81,86 ****
+--- 81,460 ----
               - "-target=store-gateway"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
@@ -90,12 +90,10 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 + metadata:
 +   name: krajo-mimir-store-gateway-zone-a
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: store-gateway
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "store-gateway-zone-a"
 +     rollout-group: store-gateway
@@ -127,10 +125,8 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +   template:
 +     metadata:
 +       labels:
-+         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +         app.kubernetes.io/name: mimir
 +         app.kubernetes.io/instance: krajo
-+         app.kubernetes.io/version: "r202"
 +         app.kubernetes.io/managed-by: Helm
 +         app.kubernetes.io/component: store-gateway
 +         app.kubernetes.io/part-of: memberlist
@@ -149,6 +145,15 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +         {}
 +       affinity:
 +         {}
++       topologySpreadConstraints:
++         - maxSkew: 1
++           topologyKey: kubernetes.io/hostname
++           whenUnsatisfiable: ScheduleAnyway
++           labelSelector:
++             matchLabels:
++               app.kubernetes.io/name: mimir
++               app.kubernetes.io/instance: krajo
++               app.kubernetes.io/component: store-gateway
 +       tolerations:
 +         []
 +       terminationGracePeriodSeconds: 240
@@ -164,7 +169,6 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +             name: krajo-mimir-runtime
 +       containers:
 +         - name: store-gateway
-+           image: "grafana/mimir:r202-d1db3dc"
 +           imagePullPolicy: IfNotPresent
 +           args:
 +             - "-target=store-gateway"
@@ -210,12 +214,10 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 + metadata:
 +   name: krajo-mimir-store-gateway-zone-b
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: store-gateway
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "store-gateway-zone-b"
 +     rollout-group: store-gateway
@@ -247,10 +249,8 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +   template:
 +     metadata:
 +       labels:
-+         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +         app.kubernetes.io/name: mimir
 +         app.kubernetes.io/instance: krajo
-+         app.kubernetes.io/version: "r202"
 +         app.kubernetes.io/managed-by: Helm
 +         app.kubernetes.io/component: store-gateway
 +         app.kubernetes.io/part-of: memberlist
@@ -269,6 +269,15 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +         {}
 +       affinity:
 +         {}
++       topologySpreadConstraints:
++         - maxSkew: 1
++           topologyKey: kubernetes.io/hostname
++           whenUnsatisfiable: ScheduleAnyway
++           labelSelector:
++             matchLabels:
++               app.kubernetes.io/name: mimir
++               app.kubernetes.io/instance: krajo
++               app.kubernetes.io/component: store-gateway
 +       tolerations:
 +         []
 +       terminationGracePeriodSeconds: 240
@@ -284,7 +293,6 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +             name: krajo-mimir-runtime
 +       containers:
 +         - name: store-gateway
-+           image: "grafana/mimir:r202-d1db3dc"
 +           imagePullPolicy: IfNotPresent
 +           args:
 +             - "-target=store-gateway"
@@ -330,12 +338,10 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 + metadata:
 +   name: krajo-mimir-store-gateway-zone-c
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: store-gateway
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "store-gateway-zone-c"
 +     rollout-group: store-gateway
@@ -367,10 +373,8 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +   template:
 +     metadata:
 +       labels:
-+         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +         app.kubernetes.io/name: mimir
 +         app.kubernetes.io/instance: krajo
-+         app.kubernetes.io/version: "r202"
 +         app.kubernetes.io/managed-by: Helm
 +         app.kubernetes.io/component: store-gateway
 +         app.kubernetes.io/part-of: memberlist
@@ -389,6 +393,15 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +         {}
 +       affinity:
 +         {}
++       topologySpreadConstraints:
++         - maxSkew: 1
++           topologyKey: kubernetes.io/hostname
++           whenUnsatisfiable: ScheduleAnyway
++           labelSelector:
++             matchLabels:
++               app.kubernetes.io/name: mimir
++               app.kubernetes.io/instance: krajo
++               app.kubernetes.io/component: store-gateway
 +       tolerations:
 +         []
 +       terminationGracePeriodSeconds: 240
@@ -404,7 +417,6 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
 +             name: krajo-mimir-runtime
 +       containers:
 +         - name: store-gateway
-+           image: "grafana/mimir:r202-d1db3dc"
 +           imagePullPolicy: IfNotPresent
 +           args:
 +             - "-target=store-gateway"
@@ -415,11 +427,11 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-statefu
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml step1/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml
-*** step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml	2022-09-13 08:15:13.322040129 +0200
---- step1/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml	2022-09-13 08:15:22.749859751 +0200
+*** step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml	2022-09-14 09:55:08.324248055 +0200
+--- step1/mimir-distributed/templates/store-gateway/store-gateway-svc.yaml	2022-09-14 09:55:19.340299134 +0200
 ***************
-*** 30,32 ****
---- 30,146 ----
+*** 28,30 ****
+--- 28,138 ----
       app.kubernetes.io/name: mimir
       app.kubernetes.io/instance: krajo
       app.kubernetes.io/component: store-gateway
@@ -430,12 +442,10 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yam
 + metadata:
 +   name: krajo-mimir-store-gateway-zone-a
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: store-gateway
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "store-gateway-zone-a"
 +     rollout-group: store-gateway
@@ -468,12 +478,10 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yam
 + metadata:
 +   name: krajo-mimir-store-gateway-zone-b
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: store-gateway
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "store-gateway-zone-b"
 +     rollout-group: store-gateway
@@ -506,12 +514,10 @@ diff -c -r step0/mimir-distributed/templates/store-gateway/store-gateway-svc.yam
 + metadata:
 +   name: krajo-mimir-store-gateway-zone-c
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: store-gateway
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "store-gateway-zone-c"
 +     rollout-group: store-gateway

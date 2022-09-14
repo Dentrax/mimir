@@ -1,19 +1,17 @@
 diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml
-*** step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:39.518874915 +0200
---- step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-13 08:13:49.370891480 +0200
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:53:21.839879714 +0200
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-statefulset.yaml	2022-09-14 09:53:32.611905901 +0200
 ***************
-*** 3,123 ****
+*** 3,127 ****
   apiVersion: apps/v1
   kind: StatefulSet
   metadata:
 -   name: krajo-mimir-alertmanager
 -   labels:
--     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 -     app.kubernetes.io/name: mimir
 -     app.kubernetes.io/instance: krajo
 -     app.kubernetes.io/component: alertmanager
 -     app.kubernetes.io/part-of: memberlist
--     app.kubernetes.io/version: "r202"
 -     app.kubernetes.io/managed-by: Helm
 -   annotations:
 -     {}
@@ -40,10 +38,8 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefuls
 -   template:
 -     metadata:
 -       labels:
--         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 -         app.kubernetes.io/name: mimir
 -         app.kubernetes.io/instance: krajo
--         app.kubernetes.io/version: "r202"
 -         app.kubernetes.io/managed-by: Helm
 -         app.kubernetes.io/component: alertmanager
 -         app.kubernetes.io/part-of: memberlist
@@ -59,6 +55,15 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefuls
 -         {}
 -       affinity:
 -         {}
+-       topologySpreadConstraints:
+-         - maxSkew: 1
+-           topologyKey: kubernetes.io/hostname
+-           whenUnsatisfiable: ScheduleAnyway
+-           labelSelector:
+-             matchLabels:
+-               app.kubernetes.io/name: mimir
+-               app.kubernetes.io/instance: krajo
+-               app.kubernetes.io/component: alertmanager
 -       tolerations:
 -         []
 -       terminationGracePeriodSeconds: 60
@@ -76,7 +81,6 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefuls
 -           emptyDir: {}
 -       containers:
 -         - name: alertmanager
--           image: "grafana/mimir:r202-d1db3dc"
 -           imagePullPolicy: IfNotPresent
 -           args:
 -             - "-target=alertmanager"
@@ -123,24 +127,22 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-statefuls
 - metadata:
     name: krajo-mimir-alertmanager-zone-a
     labels:
-      helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+      app.kubernetes.io/name: mimir
 --- 3,8 ----
 diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml
-*** step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-13 08:13:39.518874915 +0200
---- step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-13 08:13:49.366891479 +0200
+*** step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 09:53:21.839879714 +0200
+--- step4/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml	2022-09-14 09:53:32.611905901 +0200
 ***************
-*** 3,40 ****
+*** 3,38 ****
   apiVersion: v1
   kind: Service
   metadata:
 -   name: krajo-mimir-alertmanager
 -   labels:
--     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 -     app.kubernetes.io/name: mimir
 -     app.kubernetes.io/instance: krajo
 -     app.kubernetes.io/component: alertmanager
 -     app.kubernetes.io/part-of: memberlist
--     app.kubernetes.io/version: "r202"
 -     app.kubernetes.io/managed-by: Helm
 -   annotations:
 -     {}
@@ -167,10 +169,10 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml 
 - metadata:
     name: krajo-mimir-alertmanager-zone-a
     labels:
-      helm.sh/chart: mimir-distributed-3.1.0-weekly.202
+      app.kubernetes.io/name: mimir
 --- 3,8 ----
 ***************
-*** 47,53 ****
+*** 43,49 ****
       name: "alertmanager-zone-a"
       rollout-group: alertmanager
       zone: zone-a
@@ -178,9 +180,9 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml 
     annotations:
       {}
     namespace: "default"
---- 15,20 ----
+--- 13,18 ----
 ***************
-*** 85,91 ****
+*** 79,85 ****
       name: "alertmanager-zone-b"
       rollout-group: alertmanager
       zone: zone-b
@@ -188,9 +190,9 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml 
     annotations:
       {}
     namespace: "default"
---- 52,57 ----
+--- 48,53 ----
 ***************
-*** 123,129 ****
+*** 115,121 ****
       name: "alertmanager-zone-c"
       rollout-group: alertmanager
       zone: zone-c
@@ -198,4 +200,4 @@ diff -c -r step3/mimir-distributed/templates/alertmanager/alertmanager-svc.yaml 
     annotations:
       {}
     namespace: "default"
---- 89,94 ----
+--- 83,88 ----

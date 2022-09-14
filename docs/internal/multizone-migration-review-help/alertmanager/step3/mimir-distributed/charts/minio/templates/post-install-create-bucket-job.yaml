@@ -7,7 +7,6 @@ metadata:
   namespace: "default"
   labels:
     app: minio-make-bucket-job
-    chart: minio-4.0.12
     release: krajo
     heritage: Helm
   annotations:

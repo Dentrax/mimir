@@ -6,12 +6,10 @@ metadata:
   name: krajo-mimir-alertmanager
   namespace: "default"
   labels:
-    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
     app.kubernetes.io/name: mimir
     app.kubernetes.io/instance: krajo
     app.kubernetes.io/component: alertmanager
     app.kubernetes.io/part-of: memberlist
-    app.kubernetes.io/version: "r202"
     app.kubernetes.io/managed-by: Helm
 spec:
   namespaceSelector:

@@ -1,10 +1,10 @@
 Only in step1/mimir-distributed/charts: rollout_operator
 diff -c -r step0/mimir-distributed/templates/distributor/distributor-dep.yaml step1/mimir-distributed/templates/distributor/distributor-dep.yaml
-*** step0/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-13 08:13:58.350880976 +0200
---- step1/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-13 08:14:08.594841363 +0200
+*** step0/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:53:42.299931702 +0200
+--- step1/mimir-distributed/templates/distributor/distributor-dep.yaml	2022-09-14 09:53:52.895962310 +0200
 ***************
-*** 53,58 ****
---- 53,59 ----
+*** 48,53 ****
+--- 48,54 ----
               - "-target=distributor"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
@@ -13,11 +13,11 @@ diff -c -r step0/mimir-distributed/templates/distributor/distributor-dep.yaml st
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml
-*** step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:13:58.346880986 +0200
---- step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:14:08.590841384 +0200
+*** step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:53:42.295931690 +0200
+--- step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:53:52.891962298 +0200
 ***************
-*** 79,84 ****
---- 79,449 ----
+*** 83,88 ****
+--- 83,465 ----
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
               - "-ingester.ring.instance-availability-zone=zone-default"
@@ -62,12 +62,10 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 + metadata:
 +   name: krajo-mimir-ingester-zone-a
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: ingester
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "ingester-zone-a"
 +     rollout-group: ingester
@@ -100,10 +98,8 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +   template:
 +     metadata:
 +       labels:
-+         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +         app.kubernetes.io/name: mimir
 +         app.kubernetes.io/instance: krajo
-+         app.kubernetes.io/version: "r202"
 +         app.kubernetes.io/managed-by: Helm
 +         app.kubernetes.io/component: ingester
 +         app.kubernetes.io/part-of: memberlist
@@ -122,6 +118,15 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +         {}
 +       affinity:
 +         {}
++       topologySpreadConstraints:
++         - maxSkew: 1
++           topologyKey: kubernetes.io/hostname
++           whenUnsatisfiable: ScheduleAnyway
++           labelSelector:
++             matchLabels:
++               app.kubernetes.io/name: mimir
++               app.kubernetes.io/instance: krajo
++               app.kubernetes.io/component: ingester
 +       tolerations:
 +         []
 +       terminationGracePeriodSeconds: 240
@@ -137,7 +142,6 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +             name: krajo-mimir-runtime
 +       containers:
 +         - name: ingester
-+           image: "grafana/mimir:r202-d1db3dc"
 +           imagePullPolicy: IfNotPresent
 +           args:
 +             - "-target=ingester"
@@ -183,12 +187,10 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 + metadata:
 +   name: krajo-mimir-ingester-zone-b
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: ingester
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "ingester-zone-b"
 +     rollout-group: ingester
@@ -221,10 +223,8 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +   template:
 +     metadata:
 +       labels:
-+         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +         app.kubernetes.io/name: mimir
 +         app.kubernetes.io/instance: krajo
-+         app.kubernetes.io/version: "r202"
 +         app.kubernetes.io/managed-by: Helm
 +         app.kubernetes.io/component: ingester
 +         app.kubernetes.io/part-of: memberlist
@@ -243,6 +243,15 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +         {}
 +       affinity:
 +         {}
++       topologySpreadConstraints:
++         - maxSkew: 1
++           topologyKey: kubernetes.io/hostname
++           whenUnsatisfiable: ScheduleAnyway
++           labelSelector:
++             matchLabels:
++               app.kubernetes.io/name: mimir
++               app.kubernetes.io/instance: krajo
++               app.kubernetes.io/component: ingester
 +       tolerations:
 +         []
 +       terminationGracePeriodSeconds: 240
@@ -258,7 +267,6 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +             name: krajo-mimir-runtime
 +       containers:
 +         - name: ingester
-+           image: "grafana/mimir:r202-d1db3dc"
 +           imagePullPolicy: IfNotPresent
 +           args:
 +             - "-target=ingester"
@@ -304,12 +312,10 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 + metadata:
 +   name: krajo-mimir-ingester-zone-c
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: ingester
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "ingester-zone-c"
 +     rollout-group: ingester
@@ -342,10 +348,8 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +   template:
 +     metadata:
 +       labels:
-+         helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +         app.kubernetes.io/name: mimir
 +         app.kubernetes.io/instance: krajo
-+         app.kubernetes.io/version: "r202"
 +         app.kubernetes.io/managed-by: Helm
 +         app.kubernetes.io/component: ingester
 +         app.kubernetes.io/part-of: memberlist
@@ -364,6 +368,15 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +         {}
 +       affinity:
 +         {}
++       topologySpreadConstraints:
++         - maxSkew: 1
++           topologyKey: kubernetes.io/hostname
++           whenUnsatisfiable: ScheduleAnyway
++           labelSelector:
++             matchLabels:
++               app.kubernetes.io/name: mimir
++               app.kubernetes.io/instance: krajo
++               app.kubernetes.io/component: ingester
 +       tolerations:
 +         []
 +       terminationGracePeriodSeconds: 240
@@ -379,7 +392,6 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
 +             name: krajo-mimir-runtime
 +       containers:
 +         - name: ingester
-+           image: "grafana/mimir:r202-d1db3dc"
 +           imagePullPolicy: IfNotPresent
 +           args:
 +             - "-target=ingester"
@@ -390,11 +402,11 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ingester/ingester-svc.yaml step1/mimir-distributed/templates/ingester/ingester-svc.yaml
-*** step0/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-13 08:13:58.346880986 +0200
---- step1/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-13 08:14:08.590841384 +0200
+*** step0/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:53:42.295931690 +0200
+--- step1/mimir-distributed/templates/ingester/ingester-svc.yaml	2022-09-14 09:53:52.891962298 +0200
 ***************
-*** 30,32 ****
---- 30,146 ----
+*** 28,30 ****
+--- 28,138 ----
       app.kubernetes.io/name: mimir
       app.kubernetes.io/instance: krajo
       app.kubernetes.io/component: ingester
@@ -405,12 +417,10 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-svc.yaml step1/mi
 + metadata:
 +   name: krajo-mimir-ingester-zone-a
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: ingester
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "ingester-zone-a"
 +     rollout-group: ingester
@@ -443,12 +453,10 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-svc.yaml step1/mi
 + metadata:
 +   name: krajo-mimir-ingester-zone-b
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: ingester
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "ingester-zone-b"
 +     rollout-group: ingester
@@ -481,12 +489,10 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-svc.yaml step1/mi
 + metadata:
 +   name: krajo-mimir-ingester-zone-c
 +   labels:
-+     helm.sh/chart: mimir-distributed-3.1.0-weekly.202
 +     app.kubernetes.io/name: mimir
 +     app.kubernetes.io/instance: krajo
 +     app.kubernetes.io/component: ingester
 +     app.kubernetes.io/part-of: memberlist
-+     app.kubernetes.io/version: "r202"
 +     app.kubernetes.io/managed-by: Helm
 +     name: "ingester-zone-c"
 +     rollout-group: ingester
@@ -513,11 +519,11 @@ diff -c -r step0/mimir-distributed/templates/ingester/ingester-svc.yaml step1/mi
 +     rollout-group: ingester
 +     zone: zone-c
 diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distributed/templates/mimir-config.yaml
-*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-13 08:13:58.342880996 +0200
---- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-13 08:14:08.586841404 +0200
+*** step0/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:53:42.295931690 +0200
+--- step1/mimir-distributed/templates/mimir-config.yaml	2022-09-14 09:53:52.887962286 +0200
 ***************
-*** 57,62 ****
---- 57,63 ----
+*** 55,60 ****
+--- 55,61 ----
           num_tokens: 512
           tokens_file_path: /data/tokens
           unregister_on_shutdown: false
@@ -526,11 +532,11 @@ diff -c -r step0/mimir-distributed/templates/mimir-config.yaml step1/mimir-distr
         grpc_client_config:
           max_recv_msg_size: 104857600
 diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimir-distributed/templates/querier/querier-dep.yaml
-*** step0/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:13:58.342880996 +0200
---- step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-13 08:14:08.590841384 +0200
+*** step0/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:53:42.295931690 +0200
+--- step1/mimir-distributed/templates/querier/querier-dep.yaml	2022-09-14 09:53:52.891962298 +0200
 ***************
-*** 52,57 ****
---- 52,58 ----
+*** 47,52 ****
+--- 47,53 ----
               - "-target=querier"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"
@@ -539,11 +545,11 @@ diff -c -r step0/mimir-distributed/templates/querier/querier-dep.yaml step1/mimi
               - name: config
                 mountPath: /etc/mimir
 diff -c -r step0/mimir-distributed/templates/ruler/ruler-dep.yaml step1/mimir-distributed/templates/ruler/ruler-dep.yaml
-*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:13:58.342880996 +0200
---- step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-13 08:14:08.586841404 +0200
+*** step0/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:53:42.295931690 +0200
+--- step1/mimir-distributed/templates/ruler/ruler-dep.yaml	2022-09-14 09:53:52.887962286 +0200
 ***************
-*** 53,58 ****
---- 53,59 ----
+*** 48,53 ****
+--- 48,54 ----
               - "-target=ruler"
               - "-config.expand-env=true"
               - "-config.file=/etc/mimir/mimir.yaml"

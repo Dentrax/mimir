@@ -5,10 +5,8 @@ kind: Deployment
 metadata:
   name: krajo-rollout-operator
   labels:
-    helm.sh/chart: rollout-operator-0.1.2
     app.kubernetes.io/name: rollout-operator
     app.kubernetes.io/instance: krajo
-    app.kubernetes.io/version: "v0.1.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1

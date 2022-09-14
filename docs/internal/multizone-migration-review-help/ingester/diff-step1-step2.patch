@@ -1,8 +1,8 @@
 diff -c -r step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml step2/mimir-distributed/templates/ingester/ingester-statefulset.yaml
-*** step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:14:08.590841384 +0200
---- step2/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:14:18.558776658 +0200
+*** step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:53:52.891962298 +0200
+--- step2/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:03.895996675 +0200
 ***************
-*** 135,141 ****
+*** 137,143 ****
     namespace: "default"
   spec:
     podManagementPolicy: Parallel
@@ -10,7 +10,7 @@ diff -c -r step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
     selector:
       matchLabels:
         app.kubernetes.io/name: mimir
---- 135,141 ----
+--- 137,143 ----
     namespace: "default"
   spec:
     podManagementPolicy: Parallel
@@ -19,7 +19,7 @@ diff -c -r step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
       matchLabels:
         app.kubernetes.io/name: mimir
 ***************
-*** 256,262 ****
+*** 262,268 ****
     namespace: "default"
   spec:
     podManagementPolicy: Parallel
@@ -27,7 +27,7 @@ diff -c -r step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
     selector:
       matchLabels:
         app.kubernetes.io/name: mimir
---- 256,262 ----
+--- 262,268 ----
     namespace: "default"
   spec:
     podManagementPolicy: Parallel
@@ -36,7 +36,7 @@ diff -c -r step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
       matchLabels:
         app.kubernetes.io/name: mimir
 ***************
-*** 377,383 ****
+*** 387,393 ****
     namespace: "default"
   spec:
     podManagementPolicy: Parallel
@@ -44,7 +44,7 @@ diff -c -r step1/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
     selector:
       matchLabels:
         app.kubernetes.io/name: mimir
---- 377,383 ----
+--- 387,393 ----
     namespace: "default"
   spec:
     podManagementPolicy: Parallel

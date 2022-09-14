@@ -5,12 +5,10 @@ kind: Service
 metadata:
   name: krajo-mimir-ingester-zone-a
   labels:
-    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
     app.kubernetes.io/name: mimir
     app.kubernetes.io/instance: krajo
     app.kubernetes.io/component: ingester
     app.kubernetes.io/part-of: memberlist
-    app.kubernetes.io/version: "r202"
     app.kubernetes.io/managed-by: Helm
     name: "ingester-zone-a"
     rollout-group: ingester
@@ -42,12 +40,10 @@ kind: Service
 metadata:
   name: krajo-mimir-ingester-zone-b
   labels:
-    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
     app.kubernetes.io/name: mimir
     app.kubernetes.io/instance: krajo
     app.kubernetes.io/component: ingester
     app.kubernetes.io/part-of: memberlist
-    app.kubernetes.io/version: "r202"
     app.kubernetes.io/managed-by: Helm
     name: "ingester-zone-b"
     rollout-group: ingester
@@ -79,12 +75,10 @@ kind: Service
 metadata:
   name: krajo-mimir-ingester-zone-c
   labels:
-    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
     app.kubernetes.io/name: mimir
     app.kubernetes.io/instance: krajo
     app.kubernetes.io/component: ingester
     app.kubernetes.io/part-of: memberlist
-    app.kubernetes.io/version: "r202"
     app.kubernetes.io/managed-by: Helm
     name: "ingester-zone-c"
     rollout-group: ingester

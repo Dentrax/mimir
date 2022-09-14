@@ -5,12 +5,10 @@ kind: StatefulSet
 metadata:
   name: krajo-mimir-compactor
   labels:
-    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
     app.kubernetes.io/name: mimir
     app.kubernetes.io/instance: krajo
     app.kubernetes.io/component: compactor
     app.kubernetes.io/part-of: memberlist
-    app.kubernetes.io/version: "r202"
     app.kubernetes.io/managed-by: Helm
   annotations:
     {}
@@ -37,10 +35,8 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: mimir-distributed-3.1.0-weekly.202
         app.kubernetes.io/name: mimir
         app.kubernetes.io/instance: krajo
-        app.kubernetes.io/version: "r202"
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: compactor
         app.kubernetes.io/part-of: memberlist
@@ -55,17 +51,16 @@ spec:
       nodeSelector:
         {}
       affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: target
-                  operator: In
-                  values:
-                  - compactor
-              topologyKey: kubernetes.io/hostname
-            weight: 100
+        {}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: mimir
+              app.kubernetes.io/instance: krajo
+              app.kubernetes.io/component: compactor
       tolerations:
         []
       terminationGracePeriodSeconds: 240
@@ -81,7 +76,6 @@ spec:
             name: krajo-mimir-runtime
       containers:
         - name: compactor
-          image: "grafana/mimir:r202-d1db3dc"
           imagePullPolicy: IfNotPresent
           args:
             - "-target=compactor"

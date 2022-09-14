@@ -6,11 +6,9 @@ metadata:
   name: krajo-mimir-query-scheduler
   namespace: "default"
   labels:
-    helm.sh/chart: mimir-distributed-3.1.0-weekly.202
     app.kubernetes.io/name: mimir
     app.kubernetes.io/instance: krajo
     app.kubernetes.io/component: query-scheduler
-    app.kubernetes.io/version: "r202"
     app.kubernetes.io/managed-by: Helm
   annotations:
     {}
@@ -29,10 +27,8 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: mimir-distributed-3.1.0-weekly.202
         app.kubernetes.io/name: mimir
         app.kubernetes.io/instance: krajo
-        app.kubernetes.io/version: "r202"
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: query-scheduler
       annotations:
@@ -44,7 +40,6 @@ spec:
         []
       containers:
         - name: query-scheduler
-          image: "grafana/mimir:r202-d1db3dc"
           imagePullPolicy: IfNotPresent
           args:
             - "-target=query-scheduler"
@@ -82,17 +77,16 @@ spec:
       nodeSelector:
         {}
       affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: target
-                  operator: In
-                  values:
-                  - query-scheduler
-              topologyKey: kubernetes.io/hostname
-            weight: 100
+        {}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: mimir
+              app.kubernetes.io/instance: krajo
+              app.kubernetes.io/component: query-scheduler
       tolerations:
         []
       terminationGracePeriodSeconds: 180

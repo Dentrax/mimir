@@ -1,8 +1,8 @@
 diff -c -r step5/mimir-distributed/templates/ingester/ingester-statefulset.yaml step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml
-*** step5/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:14:47.050466061 +0200
---- step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-13 08:14:56.622324853 +0200
+*** step5/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:37.108115877 +0200
+--- step6/mimir-distributed/templates/ingester/ingester-statefulset.yaml	2022-09-14 09:54:48.120160341 +0200
 ***************
-*** 17,23 ****
+*** 15,21 ****
     namespace: "default"
   spec:
     podManagementPolicy: Parallel
@@ -10,7 +10,7 @@ diff -c -r step5/mimir-distributed/templates/ingester/ingester-statefulset.yaml 
     selector:
       matchLabels:
         app.kubernetes.io/name: mimir
---- 17,23 ----
+--- 15,21 ----
     namespace: "default"
   spec:
     podManagementPolicy: Parallel
