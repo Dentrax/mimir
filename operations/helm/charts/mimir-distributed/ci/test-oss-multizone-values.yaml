@@ -11,6 +11,15 @@ alertmanager:
     <<: *ci_resources
   persistentVolume:
     enabled: false
+  zone_aware_replication:
+    enabled: true
+    zones:
+      - name: zone-a
+        affinity: {}
+      - name: zone-b
+        affinity: {}
+      - name: zone-c
+        affinity: {}
 
 compactor:
   resources:
@@ -38,7 +47,13 @@ store_gateway:
   persistentVolume:
     enabled: false
   zone_aware_replication:
-    enabled: false
+    zones:
+      - name: zone-a
+        affinity: {}
+      - name: zone-b
+        affinity: {}
+      - name: zone-c
+        affinity: {}
 
 querier:
   resources:
