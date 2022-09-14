@@ -1,0 +1,56 @@
+# Test values to limit the load during CI
+kubeVersionOverride: "1.20"
+
+# Remove resource requests and limits because in CI we only have limited memory and CPU
+ci_resources: &ci_resources
+  requests:
+  limits:
+
+alertmanager:
+  resources:
+    <<: *ci_resources
+  persistentVolume:
+    enabled: false
+
+compactor:
+  resources:
+    <<: *ci_resources
+  persistentVolume:
+    enabled: false
+
+ingester:
+  replicas: 1
+  resources:
+    <<: *ci_resources
+  persistentVolume:
+    enabled: false
+  zone_aware_replication:
+    enabled: true
+    zones:
+      - name: zone-a
+        affinity: {}
+      - name: zone-b
+        affinity: {}
+      - name: zone-c
+        affinity: {}
+
+store_gateway:
+  resources:
+    <<: *ci_resources
+  persistentVolume:
+    enabled: false
+
+querier:
+  resources:
+    <<: *ci_resources
+
+query_frontend:
+  resources:
+    <<: *ci_resources
+
+query_scheduler:
+  resources:
+    <<: *ci_resources
+
+rollout_operator:
+  enabled: true

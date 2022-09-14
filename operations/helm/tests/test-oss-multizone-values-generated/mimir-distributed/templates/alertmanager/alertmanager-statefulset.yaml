@@ -3,10 +3,10 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: metamonitoring-values-mimir-alertmanager
+  name: test-oss-multizone-values-mimir-alertmanager
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: metamonitoring-values
+    app.kubernetes.io/instance: test-oss-multizone-values
     app.kubernetes.io/component: alertmanager
     app.kubernetes.io/part-of: memberlist
     app.kubernetes.io/managed-by: Helm
@@ -18,32 +18,23 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: mimir
-      app.kubernetes.io/instance: metamonitoring-values
+      app.kubernetes.io/instance: test-oss-multizone-values
       app.kubernetes.io/component: alertmanager
   updateStrategy:
     type: RollingUpdate
-  serviceName: metamonitoring-values-mimir-alertmanager
-  volumeClaimTemplates:
-    - metadata:
-        name: storage
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: "1Gi"
+  serviceName: test-oss-multizone-values-mimir-alertmanager
   template:
     metadata:
       labels:
         app.kubernetes.io/name: mimir
-        app.kubernetes.io/instance: metamonitoring-values
+        app.kubernetes.io/instance: test-oss-multizone-values
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: alertmanager
         app.kubernetes.io/part-of: memberlist
       annotations:
       namespace: "citestns"
     spec:
-      serviceAccountName: metamonitoring-values-mimir
+      serviceAccountName: test-oss-multizone-values-mimir
       securityContext:
         {}
       initContainers:
@@ -59,7 +50,7 @@ spec:
           labelSelector:
             matchLabels:
               app.kubernetes.io/name: mimir
-              app.kubernetes.io/instance: metamonitoring-values
+              app.kubernetes.io/instance: test-oss-multizone-values
               app.kubernetes.io/component: alertmanager
       tolerations:
         []
@@ -67,13 +58,15 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: metamonitoring-values-mimir-config
+            name: test-oss-multizone-values-mimir-config
             items:
               - key: "mimir.yaml"
                 path: "mimir.yaml"
         - name: runtime-config
           configMap:
-            name: metamonitoring-values-mimir-runtime
+            name: test-oss-multizone-values-mimir-runtime
+        - name: storage
+          emptyDir: {}
         - name: tmp
           emptyDir: {}
       containers:
@@ -110,9 +103,7 @@ spec:
               port: http-metrics
             initialDelaySeconds: 45
           resources:
-            requests:
-              cpu: 10m
-              memory: 32Mi
+            limits: null
           securityContext:
             readOnlyRootFilesystem: true
           env:
