@@ -33,7 +33,11 @@ for component in alertmanager ingester storegateway ; do
     diff_filename="diff-${prev_dir}-${step_dir}.patch"
     diff -c -r "${prev_dir}" "${step_dir}" > "${diff_filename}"
     "${SED}" -E -i -- 's/^((\*\*\*|---) .*yaml).*/\1/g' ${diff_filename}
+    rm -rf "${prev_dir}"
     ((i++))
+    if ! [ -e "${component}-step${i}.yaml" ] ; then
+      rm -rf ${step_dir}
+    fi
   done
   popd
 done
