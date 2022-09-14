@@ -2,3 +2,14 @@ enterprise:
   enabled: true
 graphite:
   enabled: true
+
+# Reduce variability
+kubeVersionOverride: "1.20"
+ingester:
+  zoneAwareReplication:
+    enabled: false
+store_gateway:
+  zoneAwareReplication:
+    enabled: false
+rollout_operator:
+  enabled: false

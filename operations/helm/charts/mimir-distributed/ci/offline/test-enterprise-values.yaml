@@ -28,11 +28,15 @@ ingester:
     <<: *ci_resources
   persistentVolume:
     enabled: false
+  zoneAwareReplication:
+    enabled: false
 
 store_gateway:
   resources:
     <<: *ci_resources
   persistentVolume:
+    enabled: false
+  zoneAwareReplication:
     enabled: false
 
 querier:
@@ -46,3 +50,6 @@ query_frontend:
 query_scheduler:
   resources:
     <<: *ci_resources
+
+rollout_operator:
+  enabled: false

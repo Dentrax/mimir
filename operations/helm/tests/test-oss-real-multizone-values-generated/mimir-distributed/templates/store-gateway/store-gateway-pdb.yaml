@@ -3,10 +3,10 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: metamonitoring-values-mimir-store-gateway
+  name: test-oss-real-multizone-values-mimir-store-gateway
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: metamonitoring-values
+    app.kubernetes.io/instance: test-oss-real-multizone-values
     app.kubernetes.io/component: store-gateway
     app.kubernetes.io/managed-by: Helm
   namespace: "citestns"
@@ -14,6 +14,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: mimir
-      app.kubernetes.io/instance: metamonitoring-values
+      app.kubernetes.io/instance: test-oss-real-multizone-values
       app.kubernetes.io/component: store-gateway
   maxUnavailable: 1
