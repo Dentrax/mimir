@@ -109,7 +109,7 @@ spec:
             {{- if $zoneName }}
             - "-store-gateway.sharding-ring.instance-availability-zone={{ $zoneName }}"
             {{- else }}
-              {{- if .Values.store_gateway.zone_aware_replication.migration.enabled }}
+              {{- if .Values.store_gateway.zoneAwareReplication.migration.enabled }}
             - "-store-gateway.sharding-ring.prefix="
             - "-store-gateway.sharding-ring.zone-awareness-enabled=false"
               {{- end }}

@@ -1,10 +1,10 @@
 store_gateway:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: true
     migration:
       enabled: true
-      read_path: true
-      scale_down_default_zone: true
+      readPath: true
+      scaleDownDefaultZone: true
 
 rollout_operator:
   enabled: true

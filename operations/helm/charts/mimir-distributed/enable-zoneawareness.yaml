@@ -2,7 +2,7 @@ rollout_operator:
   enabled: true
 
 store_gateway:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: true
     zones:
     - name: zone-a
@@ -58,7 +58,7 @@ store_gateway:
               topologyKey: 'kubernetes.io/hostname'
 
 ingester:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: true
     zones:
     - name: zone-a
@@ -114,7 +114,7 @@ ingester:
               topologyKey: 'kubernetes.io/hostname'
 
 alertmanager:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: true
     zones:
     - name: zone-a

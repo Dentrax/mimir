@@ -43,13 +43,13 @@ spec:
             - "-target=querier"
             - "-config.expand-env=true"
             - "-config.file=/etc/mimir/mimir.yaml"
-          {{- if .Values.ingester.zone_aware_replication.migration.enabled }}
-            {{- if not .Values.ingester.zone_aware_replication.migration.read_path }}
+          {{- if .Values.ingester.zoneAwareReplication.migration.enabled }}
+            {{- if not .Values.ingester.zoneAwareReplication.migration.readPath }}
             - "-ingester.ring.zone-awareness-enabled=false"
             {{- end }}
           {{- end }}
-          {{- if .Values.store_gateway.zone_aware_replication.migration.enabled }}
-            {{- if not .Values.store_gateway.zone_aware_replication.migration.read_path }}
+          {{- if .Values.store_gateway.zoneAwareReplication.migration.enabled }}
+            {{- if not .Values.store_gateway.zoneAwareReplication.migration.readPath }}
             - "-store-gateway.sharding-ring.prefix="
             - "-store-gateway.sharding-ring.zone-awareness-enabled=false"
             {{- end }}

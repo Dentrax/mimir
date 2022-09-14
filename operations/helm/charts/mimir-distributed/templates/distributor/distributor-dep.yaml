@@ -44,11 +44,11 @@ spec:
             - "-target=distributor"
             - "-config.expand-env=true"
             - "-config.file=/etc/mimir/mimir.yaml"
-          {{- if .Values.ingester.zone_aware_replication.migration.enabled }}
-            {{- if not .Values.ingester.zone_aware_replication.migration.write_path }}
+          {{- if .Values.ingester.zoneAwareReplication.migration.enabled }}
+            {{- if not .Values.ingester.zoneAwareReplication.migration.writePath }}
             - "-ingester.ring.zone-awareness-enabled=false"
             {{- end }}
-            {{- if .Values.ingester.zone_aware_replication.migration.exclude_default_zone }}
+            {{- if .Values.ingester.zoneAwareReplication.migration.excludeDefaultZone }}
             - "-ingester.ring.excluded-zones=zone-default"
             {{- end }}
           {{- end }}

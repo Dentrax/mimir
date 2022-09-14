@@ -1,5 +1,5 @@
 alertmanager:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: false
     zones:
       - name: zone-a
@@ -9,7 +9,7 @@ alertmanager:
       - name: zone-c
         affinity: {}
 ingester:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: false
     zones:
       - name: zone-a
@@ -19,7 +19,7 @@ ingester:
       - name: zone-c
         affinity: {}
 store_gateway:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: false
     zones:
       - name: zone-a

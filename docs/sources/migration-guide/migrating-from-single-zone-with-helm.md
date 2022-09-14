@@ -27,17 +27,17 @@ Using zone aware replication for alertmanager is optional and is only available 
 
 ### Configure zone aware replication for alertmanagers
 
-This section is about planning and configuring the availability zones defined in the array value `alertmanager.zone_aware_replication.zones`.
+This section is about planning and configuring the availability zones defined in the array value `alertmanager.zoneAwareReplication.zones`.
 
 > **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
 
 There are two use cases in general:
 
-1. Speeding up rollout of alertmanagers. In this case the default value for `alertmanager.zone_aware_replication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node.
+1. Speeding up rollout of alertmanagers. In this case the default value for `alertmanager.zoneAwareReplication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node.
 1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
    ```yaml
    alertmanager:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false # Do not turn on zone awareness without migration because of potential query errors
        zones:
          - name: zone-a
@@ -107,7 +107,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
    ```yaml
    alertmanager:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
@@ -127,11 +127,11 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
    ```yaml
    alertmanager:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         write_path: true
+         writePath: true
 
    rollout_operator:
      enabled: true
@@ -148,12 +148,12 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
    ```yaml
    alertmanager:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         write_path: true
-         scale_down_default_zone: true
+         writePath: true
+         scaleDownDefaultZone: true
 
    rollout_operator:
      enabled: true
@@ -170,7 +170,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
    ```yaml
    alertmanager:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    rollout_operator:
@@ -183,7 +183,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
    ```yaml
    alertmanager:
      ...
-     {{- if .Values.alertmanager.zone_aware_replication.enabled }}
+     {{- if .Values.alertmanager.zoneAwareReplication.enabled }}
      sharding_ring:
        zone_awareness_enabled: true
      {{- end }}
@@ -205,17 +205,17 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 ### Configure zone aware replication for store-gateways
 
-This section is about planning and configuring the availability zones defined in the array value `store_gateway.zone_aware_replication.zones`.
+This section is about planning and configuring the availability zones defined in the array value `store_gateway.zoneAwareReplication.zones`.
 
 > **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
 
 There are two use cases in general:
 
-1. Speeding up rollout of store gateways. In this case the default value for `store_gateway.zone_aware_replication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that store gateways from different zones do not mix, but it allows multiple store gateways of the same zone on the same node.
+1. Speeding up rollout of store gateways. In this case the default value for `store_gateway.zoneAwareReplication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that store gateways from different zones do not mix, but it allows multiple store gateways of the same zone on the same node.
 1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false # Do not turn on zone awareness without migration because of potential query errors
        zones:
          - name: zone-a
@@ -273,11 +273,11 @@ There are two use cases in general:
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
-> **Note**: Do not turn on zone awareness without migration because of potential query errors, make sure that `store_gateway.zone_aware_replication.enabled` is set to false.
+> **Note**: Do not turn on zone awareness without migration because of potential query errors, make sure that `store_gateway.zoneAwareReplication.enabled` is set to false.
 
 ```yaml
 store_gateway:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: false
 ```
 
@@ -300,7 +300,7 @@ There are two ways to do the migration:
 
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false
 
    nginx:
@@ -320,7 +320,7 @@ There are two ways to do the migration:
    ```yaml
    store_gateway:
      replicas: 0
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false
 
    nginx:
@@ -341,7 +341,7 @@ There are two ways to do the migration:
 
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    nginx:
@@ -363,14 +363,14 @@ There are two ways to do the migration:
 
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    rollout_operator:
      enabled: true
    ```
 
-   > **Note**: these values are actually the default, which means that removing the values `store_gateway.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+   > **Note**: these values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
 1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
@@ -384,7 +384,7 @@ There are two ways to do the migration:
 
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
@@ -408,11 +408,11 @@ There are two ways to do the migration:
 
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         read_path: true
+         readPath: true
 
    rollout_operator:
      enabled: true
@@ -429,12 +429,12 @@ There are two ways to do the migration:
 
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         read_path: true
-         scale_down_default_zone: true
+         readPath: true
+         scaleDownDefaultZone: true
 
    rollout_operator:
      enabled: true
@@ -451,7 +451,7 @@ There are two ways to do the migration:
 
    ```yaml
    store_gateway:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    rollout_operator:
@@ -459,19 +459,19 @@ There are two ways to do the migration:
    ```
    [//]: # "storegateway-step4"
 
-   These values are actually the default, which means that removing the values `store_gateway.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+   These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
    > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
 
    ```yaml
    store_gateway:
      sharding_ring:
-       {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
        kvstore:
          prefix: multi-zone/
        {{- end }}
        tokens_file_path: /data/tokens
-       {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
        zone_awareness_enabled: true
        {{- end }}
    ```
@@ -494,17 +494,17 @@ There are two ways to do the migration:
 
 ### Configure zone aware replication for ingesters
 
-This section is about planning and configuring the availability zones defined in the array value `ingester.zone_aware_replication.zones`.
+This section is about planning and configuring the availability zones defined in the array value `ingester.zoneAwareReplication.zones`.
 
 > **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
 
 There are two use cases in general:
 
-1. Speeding up rollout of ingesters. In this case the default value for `ingester.zone_aware_replication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node.
+1. Speeding up rollout of ingesters. In this case the default value for `ingester.zoneAwareReplication.zones` can be used. The default value defines 3 "virtual" zones and sets affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node.
 1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. For example:
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false # Do not turn on zone awareness without migration because of data loss
        zones:
          - name: zone-a
@@ -562,11 +562,11 @@ There are two use cases in general:
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
-> **Note**: Do not turn on zone awareness without migration because of data loss, make sure that `ingester.zone_aware_replication.enabled` is set to false.
+> **Note**: Do not turn on zone awareness without migration because of data loss, make sure that `ingester.zoneAwareReplication.enabled` is set to false.
 
 ```yaml
 ingester:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: false
 ```
 
@@ -597,7 +597,7 @@ There are two ways to do the migration:
            unregister_on_shutdown: true
 
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false
    ```
 
@@ -619,7 +619,7 @@ There are two ways to do the migration:
            unregister_on_shutdown: true
 
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false
 
    nginx:
@@ -647,7 +647,7 @@ There are two ways to do the migration:
 
    ingester:
      replicas: 0
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: false
 
    nginx:
@@ -668,7 +668,7 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    nginx:
@@ -690,14 +690,14 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    rollout_operator:
      enabled: true
    ```
 
-   > **Note**: these values are actually the default, which means that removing the values `ingester.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+   > **Note**: these values are actually the default, which means that removing the values `ingester.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
 1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
@@ -731,7 +731,7 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
@@ -754,7 +754,7 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
@@ -773,7 +773,7 @@ There are two ways to do the migration:
 
    The 3 hours is calculated from `blocks_storage.tsdb.block_ranges_period` + `blocks_storage.tsdb.head_compaction_idle_timeout` Grafana Mimir parameters to give enough time for ingesters to remove stale series from memory. Stale series will be there due to series being moved between ingesters.
 
-1. If the current `<N>` above in `ingester.zone_aware_replication.migration.replicas` is less than `ingester.replicas`, go back to step 8.
+1. If the current `<N>` above in `ingester.zoneAwareReplication.migration.replicas` is less than `ingester.replicas`, go back to step 8.
 
 1. Enable zone awareness on the write path.
 
@@ -781,11 +781,11 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         write_path: true
+         writePath: true
 
    rollout_operator:
      enabled: true
@@ -806,12 +806,12 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         write_path: true
-         read_path: true
+         writePath: true
+         readPath: true
 
    rollout_operator:
      enabled: true
@@ -830,13 +830,13 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         write_path: true
-         read_path: true
-         exclude_default_zone: true
+         writePath: true
+         readPath: true
+         excludeDefaultZone: true
 
    rollout_operator:
      enabled: true
@@ -855,14 +855,14 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
        migration:
          enabled: true
-         write_path: true
-         read_path: true
-         exclude_default_zone: true
-         scale_down_default_zone: true
+         writePath: true
+         readPath: true
+         excludeDefaultZone: true
+         scaleDownDefaultZone: true
 
    rollout_operator:
      enabled: true
@@ -879,7 +879,7 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    rollout_operator:
@@ -897,14 +897,14 @@ There are two ways to do the migration:
 
    ```yaml
    ingester:
-     zone_aware_replication:
+     zoneAwareReplication:
        enabled: true
 
    rollout_operator:
      enabled: true
    ```
 
-   These values are actually the default, which means that removing the values `ingester.zone_aware_replication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+   These values are actually the default, which means that removing the values `ingester.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
    > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
 
@@ -913,7 +913,7 @@ There are two ways to do the migration:
       ring:
         ...
         unregister_on_shutdown: false
-        {{- if .Values.ingester.zone_aware_replication.enabled }}
+        {{- if .Values.ingester.zoneAwareReplication.enabled }}
         zone_awareness_enabled: true
         {{- end }}
    ```

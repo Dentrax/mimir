@@ -1,5 +1,5 @@
 store_gateway:
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: true
 
 rollout_operator:

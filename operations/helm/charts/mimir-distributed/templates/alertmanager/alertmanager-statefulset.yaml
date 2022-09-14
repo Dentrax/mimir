@@ -113,7 +113,7 @@ spec:
             {{- if $zoneName }}
             - "-alertmanager.sharding-ring.instance-availability-zone={{ $zoneName }}"
             {{- else }}
-              {{- if .Values.alertmanager.zone_aware_replication.enabled }}
+              {{- if .Values.alertmanager.zoneAwareReplication.enabled }}
             - "-alertmanager.sharding-ring.instance-availability-zone=zone-default"
               {{- end }}
             {{- end }}

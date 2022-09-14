@@ -11,7 +11,7 @@ alertmanager:
     <<: *ci_resources
   persistentVolume:
     enabled: false
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: true
     zones:
       - name: zone-a
@@ -32,7 +32,7 @@ ingester:
     <<: *ci_resources
   persistentVolume:
     enabled: false
-  zone_aware_replication:
+  zoneAwareReplication:
     zones:
       - name: zone-a
         affinity: {}
@@ -46,7 +46,7 @@ store_gateway:
     <<: *ci_resources
   persistentVolume:
     enabled: false
-  zone_aware_replication:
+  zoneAwareReplication:
     zones:
       - name: zone-a
         affinity: {}

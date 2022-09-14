@@ -10,7 +10,7 @@ metadata:
   name: {{ include "mimir.resourceName" $args }}
   labels:
     {{- include "mimir.labels" $args | nindent 4 }}
-    {{- if and $zoneName .Values.alertmanager.zone_aware_replication.migration.enabled }}
+    {{- if and $zoneName .Values.alertmanager.zoneAwareReplication.migration.enabled }}
     prometheus.io/service-monitor: "false"
     {{- end }}
     {{- with .Values.alertmanager.service.labels }}

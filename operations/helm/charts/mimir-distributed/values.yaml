@@ -109,7 +109,7 @@ mimir:
       data_dir: /data
       enable_api: true
       external_url: /alertmanager
-      {{- if .Values.alertmanager.zone_aware_replication.enabled }}
+      {{- if .Values.alertmanager.zoneAwareReplication.enabled }}
       sharding_ring:
         zone_awareness_enabled: true
       {{- end }}
@@ -233,7 +233,7 @@ mimir:
         num_tokens: 512
         tokens_file_path: /data/tokens
         unregister_on_shutdown: false
-        {{- if .Values.ingester.zone_aware_replication.enabled }}
+        {{- if .Values.ingester.zoneAwareReplication.enabled }}
         zone_awareness_enabled: true
         {{- end }}
 
@@ -300,12 +300,12 @@ mimir:
 
     store_gateway:
       sharding_ring:
-        {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+        {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
         kvstore:
           prefix: multi-zone/
         {{- end }}
         tokens_file_path: /data/tokens
-        {{- if .Values.store_gateway.zone_aware_replication.enabled }}
+        {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
         zone_awareness_enabled: true
         {{- end }}
 
@@ -379,9 +379,9 @@ alertmanager:
   # -- The name of the PriorityClass for alertmanager pods
   priorityClassName: null
 
-  # -- NodeSelector to pin alertmanager pods to certain set of nodes. This is ignored when alertmanager.zone_aware_replication.enabled=true.
+  # -- NodeSelector to pin alertmanager pods to certain set of nodes. This is ignored when alertmanager.zoneAwareReplication.enabled=true.
   nodeSelector: {}
-  # -- Pod affinity settings for the alertmanager. This is ignored when alertmanager.zone_aware_replication.enabled=true.
+  # -- Pod affinity settings for the alertmanager. This is ignored when alertmanager.zoneAwareReplication.enabled=true.
   affinity: {}
 
   # -- topologySpreadConstraints allows to customize part of the default topologySpreadConstraints. labelSelectors
@@ -492,11 +492,11 @@ alertmanager:
   extraEnvFrom: []
 
   # -- Options to configure zone aware replication for alertmanager
-  zone_aware_replication:
+  zoneAwareReplication:
     # -- Enable zone aware replication for alertmanager
     enabled: false
     # -- Maximum number of alertmanagers that can be unavailable per zone during rollout
-    max_unavailable: 2
+    maxUnavailable: 2
     # -- Auxiliary values for migration, see https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm/
     migration:
       # -- Indicate if migration is ongoing for multi zone alertmanager
@@ -504,7 +504,7 @@ alertmanager:
       # -- Total number of replicas to start in availability zones when migration is enabled
       replicas: 0
       # -- Scale default zone alertmanagers to 0
-      scale_down_default_zone: false
+      scaleDownDefaultZone: false
     # -- Zone definitions for alertmanager zones
     zones:
     - name: zone-a
@@ -655,9 +655,9 @@ ingester:
 
   podManagementPolicy: Parallel
 
-  # -- NodeSelector to pin ingester pods to certain set of nodes. This is ignored when ingester.zone_aware_replication.enabled=true.
+  # -- NodeSelector to pin ingester pods to certain set of nodes. This is ignored when ingester.zoneAwareReplication.enabled=true.
   nodeSelector: {}
-  # -- Pod affinity settings for the ingester. This is ignored when ingester.zone_aware_replication.enabled=true.
+  # -- Pod affinity settings for the ingester. This is ignored when ingester.zoneAwareReplication.enabled=true.
   affinity: {}
 
   # -- topologySpreadConstraints allows to customize part of the default topologySpreadConstraints. labelSelectors
@@ -736,25 +736,25 @@ ingester:
   extraEnvFrom: []
 
   # -- Options to configure zone aware replication for ingester
-  zone_aware_replication:
+  zoneAwareReplication:
     # -- Enable zone aware replication for ingester
     enabled: true
     # -- Maximum number of ingesters that can be unavailable per zone during rollout
-    max_unavailable: 25
+    maxUnavailable: 25
     # -- Auxiliary values for migration, see https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm/
     migration:
       # -- Indicate if migration is ongoing for multi zone ingester
       enabled: false
       # -- Exclude default zone on write path
-      exclude_default_zone: false
+      excludeDefaultZone: false
       # -- Enable zone awareness, read path only
-      read_path: false
+      readPath: false
       # -- Total number of replicas to start in availability zones when migration is enabled
       replicas: 0
       # -- Scale default zone ingesters to 0
-      scale_down_default_zone: false
+      scaleDownDefaultZone: false
       # -- Enable zone awareness, write path only
-      write_path: false
+      writePath: false
     # -- Zone definitions for ingester zones
     zones:
     - name: zone-a
@@ -1179,9 +1179,9 @@ store_gateway:
   # -- The name of the PriorityClass for store-gateway pods
   priorityClassName: null
 
-  # -- NodeSelector to pin store-gateway pods to certain set of nodes. This is ignored when store_gateway.zone_aware_replication.enabled=true.
+  # -- NodeSelector to pin store-gateway pods to certain set of nodes. This is ignored when store_gateway.zoneAwareReplication.enabled=true.
   nodeSelector: {}
-  # -- Pod affinity settings for the store_gateway. This is ignored when store_gateway.zone_aware_replication.enabled=true.
+  # -- Pod affinity settings for the store_gateway. This is ignored when store_gateway.zoneAwareReplication.enabled=true.
   affinity: {}
 
   # -- topologySpreadConstraints allows to customize part of the default topologySpreadConstraints. labelSelectors
@@ -1257,19 +1257,19 @@ store_gateway:
   extraEnvFrom: []
 
   # -- Options to configure zone aware replication for store-gateway
-  zone_aware_replication:
+  zoneAwareReplication:
     # -- Enable zone aware replication for store-gateway
     enabled: true
     # -- Maximum number of store-gateways that can be unavailable per zone during rollout
-    max_unavailable: 10
+    maxUnavailable: 10
     # -- Auxiliary values for migration, see https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm/
     migration:
       # -- Indicate if migration is ongoing for multi zone store-gateway
       enabled: false
-      # -- Enable zone awareness on the read_path
-      read_path: false
+      # -- Enable zone awareness on the readPath
+      readPath: false
       # -- Scale default zone store gateways to 0
-      scale_down_default_zone: false
+      scaleDownDefaultZone: false
     # -- Zone definitions for store-gateway zones
     zones:
     - name: zone-a

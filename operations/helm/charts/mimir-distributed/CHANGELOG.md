@@ -28,10 +28,10 @@ Entries should include a reference to the Pull Request that introduced the chang
 * [CHANGE] **breaking change** **Data loss without action.** Enable [zone aware replication](https://grafana.com/docs/mimir/latest/operators-guide/configure/configuring-zone-aware-replication/) for ingesters and store-gateways by default. #2778
   - If you are **installing** the chart:
     - If there are more then 3 nodes in the cluster, no action is needed
-    - If there are 3 or less nodes in the cluster, you should relax the affinity rules in `ingester.zone_aware_replication.zones` and `store_gateway.zone_aware_replication.zones`. The simplest would be to set each to `{}`, for example:
+    - If there are 3 or less nodes in the cluster, you should relax the affinity rules in `ingester.zoneAwareReplication.zones` and `store_gateway.zoneAwareReplication.zones`. The simplest would be to set each to `{}`, for example:
       ```yaml
       ingester:
-        zone_aware_replication:
+        zoneAwareReplication:
           zones:
             - name: zone-a
               affinity: {}
@@ -40,7 +40,7 @@ Entries should include a reference to the Pull Request that introduced the chang
             - name: zone-c
               affinity: {}
       store_gateway:
-        zone_aware_replication:
+        zoneAwareReplication:
           zones:
             - name: zone-a
               affinity: {}
@@ -53,10 +53,10 @@ Entries should include a reference to the Pull Request that introduced the chang
     - Turn off zone aware replication, by setting the following values:
       ```yaml
       ingester:
-        zone_aware_replication:
+        zoneAwareReplication:
           enabled: false
       store_gateway:
-        zone_aware_replication:
+        zoneAwareReplication:
           enabled: false
       rollout_operator:
         enabled: false

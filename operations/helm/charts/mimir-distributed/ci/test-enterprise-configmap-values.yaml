@@ -54,7 +54,7 @@ ingester:
     <<: *ci_resources
   persistentVolume:
     enabled: false
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: false
 
 store_gateway:
@@ -62,7 +62,7 @@ store_gateway:
     <<: *ci_resources
   persistentVolume:
     enabled: false
-  zone_aware_replication:
+  zoneAwareReplication:
     enabled: false
 
 querier:
