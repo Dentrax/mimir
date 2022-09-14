@@ -175,6 +175,17 @@ Resource name template
 {{ include "mimir.fullname" .ctx }}{{- if .component -}}-{{ .component }}{{- end -}}
 {{- end -}}
 
+{{- define "mimir.zonedResourceName" -}}
+{{- $component_values := index .ctx.Values .component_config -}}
+{{- if $component_values.zone_aware_replication.enabled -}}
+{{- $zoneNameCharLimit := sub 64 (len (printf "%s-" .component)) -}}
+{{- if gt (len .rolloutZoneName) $zoneNameCharLimit -}}
+{{- fail (printf "Zone Name (%s) exceeds character limit (%d)" .rolloutZoneName $zoneNameCharLimit ) -}}
+{{- end -}}
+{{- end -}}
+{{ include "mimir.resourceName" . }}{{- if  $component_values.zone_aware_replication.enabled -}}-{{ .rolloutZoneName }}{{- end -}}
+{{- end -}}
+
 {{/*
 Simple resource labels
 */}}
@@ -205,6 +216,16 @@ app.kubernetes.io/version: {{ .ctx.Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .ctx.Release.Service }}
 {{- end }}
+{{- end -}}
+
+{{- define "mimir.zonedLabels" -}}
+{{ include "mimir.labels" . }}
+{{- $component_values := index .ctx.Values .component_config -}}
+{{- if $component_values.zone_aware_replication.enabled }}
+name: "{{ .component }}-{{ .rolloutZoneName }}" {{- /* Currently required for rollout-operator. https://github.com/grafana/rollout-operator/issues/15 */}}
+rollout-group: {{ .component }}
+zone: {{ .rolloutZoneName }}
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -244,6 +265,16 @@ app.kubernetes.io/part-of: memberlist
 {{- with ($componentSection).podLabels }}
 {{ toYaml . }}
 {{- end }}
+{{- end -}}
+
+{{- define "mimir.zonedPodLabels" -}}
+{{ include "mimir.podLabels" . }}
+{{- $component_values := index .ctx.Values .component_config -}}
+{{- if $component_values.zone_aware_replication.enabled }}
+name: "{{ .component }}-{{ .rolloutZoneName }}" {{- /* Currently required for rollout-operator. https://github.com/grafana/rollout-operator/issues/15 */}}
+rollout-group: {{ .component }}
+zone: {{ .rolloutZoneName }}
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -286,6 +317,16 @@ app.kubernetes.io/component: {{ .component }}
 {{- end }}
 {{- end -}}
 {{- end -}}
+
+{{- define "mimir.zonedSelectorLabels" -}}
+{{ include "mimir.selectorLabels" . }}
+{{- $component_values := index .ctx.Values .component_config -}}
+{{- if $component_values.zone_aware_replication.enabled }}
+rollout-group: {{ .component }}
+zone: {{ .rolloutZoneName }}
+{{- end -}}
+{{- end -}}
+
 
 {{/*
 Alertmanager http prefix
@@ -397,4 +438,38 @@ Return if we should create a SecurityContextConstraints. Takes into account user
 */}}
 {{- define "mimir.rbac.useSecurityContextConstraints" -}}
 {{- and .Values.rbac.create (eq .Values.rbac.type "scc") -}}
+{{- end -}}
+
+
+{{/* Creates dict for zone aware replication configuration */}}
+{{- define "mimir.zoneAwareReplicationMap" -}}
+{{- $zonesMap := (dict) -}}
+{{- $config := index .ctx.Values .component_config -}}
+{{- if $config.zone_aware_replication.enabled -}}
+{{- range $idx, $rolloutZone := $config.zone_aware_replication.zones -}}
+{{- $_ := set $zonesMap $rolloutZone.name (dict "affinity" ($rolloutZone.affinity | default (dict)) "nodeSelector" ($rolloutZone.nodeSelector | default (dict) ) ) -}}
+{{- end -}}
+{{- if lt (len $zonesMap) 3 -}}
+{{- fail "When zone awareness is enabled, you must have at least 3 zones defined." -}}
+{{- end -}}
+{{- else -}}
+{{- merge $zonesMap (dict "default" (dict "affinity" $config.affinity "nodeSelector" $config.nodeSelector)) -}}
+{{- end -}}
+{{- $zonesMap | toYaml }}
+{{- end -}}
+
+
+{{- define "mimir.componentAnnotations" -}}
+{{- $component_values := index .ctx.Values .component_config -}}
+{{- if $component_values.zone_aware_replication.enabled }}
+{{- $map := dict "rollout-max-unavailable" ($component_values.zone_aware_replication.max_unavailable | toString) -}}
+{{- toYaml (deepCopy $map | mergeOverwrite $component_values.annotations) }}
+{{- else -}}
+{{ toYaml $component_values.annotations }}
+{{- end -}}
+{{- end -}}
+
+
+{{- define "mimir.var_dump" -}}
+{{- . | mustToPrettyJson | printf "\nThe JSON output of the dumped var is: \n%s" | fail }}
 {{- end -}}
