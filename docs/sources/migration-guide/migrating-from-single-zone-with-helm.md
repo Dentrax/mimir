@@ -33,7 +33,7 @@ This section is about planning and configuring the availability zones defined in
 
 There are two use cases in general:
 
-1. Speeding up rollout of alertmanagers. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node:
+1. Speeding up rollout of alertmanagers in case there are more than 3 replicas. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that alertmanagers from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node:
 
    ```yaml
    alertmanager:
@@ -184,7 +184,7 @@ This section is about planning and configuring the availability zones defined in
 
 There are two use cases in general:
 
-1. Speeding up rollout of store-gateways. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that store-gateways from different zones do not mix, but it allows multiple store-gateways of the same zone on the same node:
+1. Speeding up rollout of store-gateways in case there are more than 3 replicas. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that store-gateways from different zones do not mix, but it allows multiple store-gateways of the same zone on the same node:
 
    ```yaml
    store_gateway:
@@ -444,7 +444,7 @@ This section is about planning and configuring the availability zones defined in
 
 There are two use cases in general:
 
-1. Speeding up rollout of ingesters. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node:
+1. Speeding up rollout of ingesters in case there are more than 3 replicas. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node:
 
    ```yaml
    ingester:
