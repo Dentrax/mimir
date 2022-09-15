@@ -736,7 +736,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-   In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from distributors, and rulers.
+   In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from distributors and rulers.
 
 1. Once all distributors and rulers have restarted, wait 12 hours.
 
