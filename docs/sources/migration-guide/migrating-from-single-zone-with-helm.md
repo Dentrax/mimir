@@ -7,7 +7,7 @@ weight: 10
 
 # Migrate from single zone to zone aware replication with Helm
 
-This document explains how to migrate stateful componens from single zone to [zone aware replication]({{< relref "../operators-guide/configure/configuring-zone-aware-replication/" >}}) with Helm. The three components in question are the [alertmanager]({{< relref "../operators-guide/architecture/components/alertmanager.md" >}}), the [store-gateway]({{< relref "../operators-guide/architecture/components/store-gateway.md" >}}) and the [ingester]({{< relref "../operators-guide/architecture/components/ingester.md" >}}).
+This document explains how to migrate stateful components from single zone to [zone aware replication]({{< relref "../operators-guide/configure/configuring-zone-aware-replication/" >}}) with Helm. The three components in question are the [alertmanager]({{< relref "../operators-guide/architecture/components/alertmanager.md" >}}), the [store-gateway]({{< relref "../operators-guide/architecture/components/store-gateway.md" >}}) and the [ingester]({{< relref "../operators-guide/architecture/components/ingester.md" >}}).
 
 The migration path of the alertmanager and store-gatway is straight forward, however migrating ingesters is more complicated.
 
@@ -184,7 +184,7 @@ This section is about planning and configuring the availability zones defined in
 
 There are two use cases in general:
 
-1. Speeding up rollout of store-gateways. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that store-gateways from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node:
+1. Speeding up rollout of store-gateways. In this case use the default value in the `small.yaml`, `large.yaml`, `capped-small.yaml` or `capped-large.yaml`. The default value defines 3 "virtual" zones and sets affinity rules so that store-gateways from different zones do not mix, but it allows multiple store-gateways of the same zone on the same node:
 
    ```yaml
    store_gateway:
@@ -193,7 +193,7 @@ There are two use cases in general:
        topologyKey: "kubernetes.io/hostname" # Triggers creating anti-affinity rules
    ```
 
-1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. Setting `topologyKey` will instruct the Helm chart to create anti-affinity rules so that store-gateways from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node. For example:
+1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. Setting `topologyKey` will instruct the Helm chart to create anti-affinity rules so that store-gateways from different zones do not mix, but it allows multiple store-gateways of the same zone on the same node. For example:
    ```yaml
    store_gateway:
      zoneAwareReplication:
@@ -453,7 +453,7 @@ There are two use cases in general:
        topologyKey: "kubernetes.io/hostname" # Triggers creating anti-affinity rules
    ```
 
-1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. Setting `topologyKey` will instruct the Helm chart to create anti-affinity rules so that store-gateways from different zones do not mix, but it allows multiple alertmanagers of the same zone on the same node. For example:
+1. Geographical redundancy. In this case you need to set a suitable [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) value to choose where the pods of each zone are to be placed. Setting `topologyKey` will instruct the Helm chart to create anti-affinity rules so that ingesters from different zones do not mix, but it allows multiple ingesters of the same zone on the same node. For example:
    ```yaml
    ingester:
      zoneAwareReplication:
@@ -736,7 +736,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-   In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from distributors, rulers.
+   In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from distributors, and rulers.
 
 1. Once all distributors and rulers have restarted, wait 12 hours.
 
