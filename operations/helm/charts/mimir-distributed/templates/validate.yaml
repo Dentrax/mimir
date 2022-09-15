@@ -187,7 +187,7 @@
 {{- end -}}
 
 {{- with $.Values.store_gateway.zoneAwareReplication.migration }}
-{{- $steps := list "enabled" "readPath" "scaleDownDefaultZone" }}
+{{- $steps := list "enabled" "readPath" }}
 {{- range $i, $item := rest $steps -}}
 {{- range $j, $mustHave := slice $steps 0 $i }}
 {{- with $.Values.store_gateway.zoneAwareReplication.migration }}

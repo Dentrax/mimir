@@ -353,9 +353,9 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait for the `helm` command to finish.
+1. Wait for all queriers and rulers to restart and become ready.
 
-1. Scale down non zone aware store-gateways to 0.
+1. Delete the non zone aware store-gateways.
 
    Replace the contents of the `migrate.yaml` file with:
 
@@ -363,10 +363,6 @@ There are two ways to do the migration:
    store_gateway:
      zoneAwareReplication:
        enabled: true
-       migration:
-         enabled: true
-         readPath: true
-         scaleDownDefaultZone: true
 
    rollout_operator:
      enabled: true
@@ -390,8 +386,6 @@ There are two ways to do the migration:
    rollout_operator:
      enabled: true
    ```
-
-   [//]: # "storegateway-step4"
 
    These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
