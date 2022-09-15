@@ -87,7 +87,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
    In this step zone awareness is enabled with the default zone. In this step new StatefulSets are created for zone aware alertmanagers, but no new pods are started.
 
-1. Wait until all alertmanagers are restarted.
+1. Wait until all alertmanagers are restarted and are ready.
 
 1. Scale up zone aware alertmanagers.
 
@@ -109,7 +109,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait until all new zone aware alertmanagers are started.
+1. Wait until all new zone aware alertmanagers are started and are ready.
 
 1. Scale down old alertmanagers to 0.
 
@@ -264,7 +264,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait until all requested store-gateways are running.
+1. Wait until all requested store-gateways are running and are ready.
 
 1. Set the final configuration.
 
@@ -331,11 +331,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait for all new store-gateways to start up.
-
-1. Wait for store-gateways to sync all blocks.
-
-   The logs of the new store-gateways should contain the line "successfully synchronized TSDB blocks for all users".
+1. Wait for all new store-gateways to start up and be ready.
 
 1. Make the read path use the new zone aware store-gateways.
 
@@ -380,7 +376,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait for non zone aware store-gateways to stop.
+1. Wait for non zone aware store-gateways to terminate.
 
 1. Set the final configuration.
 
@@ -508,7 +504,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait for all ingesters to restart.
+1. Wait for all ingesters to restart and be ready.
 
 1. Turn off traffic to the installation.
 
@@ -587,7 +583,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait until all requested ingesters are running.
+1. Wait until all requested ingesters are running and are ready.
 
 1. Enable traffic to the installation.
 
@@ -661,7 +657,7 @@ There are two ways to do the migration:
 
    In this step new zone aware statefulsets are created - but no new pods are started yet. The parameter `ingester.ring.zone_awareness_enabled: true` is set in the Mimir configuration via the `mimir.config` value. The flag `-ingester.ring.zone-awareness-enabled=false` is set on distributors, rulers and queriers. The flags `-blocks-storage.tsdb.flush-blocks-on-shutdown` and `-ingester.ring.unregister-on-shutdown` are set to true for the ingesters.
 
-1. Wait for all Mimir components to restart.
+1. Wait for all Mimir components to restart and be ready.
 
 1. Progressively scale zone-aware ingesters up, maximum 21 at a time.
 
@@ -685,7 +681,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Once the new ingesters are started, wait at least 3 hours.
+1. Once the new ingesters are started and are ready, wait at least 3 hours.
 
    The 3 hours is calculated from `blocks_storage.tsdb.block_ranges_period` + `blocks_storage.tsdb.head_compaction_idle_timeout` Grafana Mimir parameters to give enough time for ingesters to remove stale series from memory. Stale series will be there due to series being moved between ingesters.
 
@@ -706,7 +702,7 @@ There are two ways to do the migration:
 
    1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-   1. Wait until queriers and rulers have restarted.
+   1. Wait until queriers and rulers have restarted and are ready.
 
    1. Monitor resource utilization of queriers and rulers and scale up if necessary. Turning off shuffle sharding may increase resource utilization.
 
@@ -732,7 +728,7 @@ There are two ways to do the migration:
 
    In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from distributors and rulers.
 
-1. Once all distributors and rulers have restarted, wait 12 hours.
+1. Once all distributors and rulers have restarted and are ready, wait 12 hours.
 
    The 12 hours is calculated from the `querier.query_store_after` Grafana Mimir parameter.
 
@@ -759,7 +755,7 @@ There are two ways to do the migration:
 
    In this step the flag `-ingester.ring.zone-awareness-enabled=false` is removed from queriers.
 
-1. Wait until all queriers have restarted.
+1. Wait until all queriers have restarted and are ready.
 
 1. Exclude non zone aware ingesters from the write path.
 
@@ -785,7 +781,7 @@ There are two ways to do the migration:
 
    In this step the flag `-distributor.excluded-zones=zone-default` is added to distributors and rulers.
 
-1. Wait until all distributors and rulers have restarted.
+1. Wait until all distributors and rulers have restarted and are ready.
 
 1. Scale down non zone aware ingesters to 0.
 
@@ -829,7 +825,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait until all old ingesters have terminated.
+1. Wait until the `helm` command exits.
 
 1. Set the final configuration.
 
@@ -891,7 +887,7 @@ There are two ways to do the migration:
 
    1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-   1. Wait until queriers and rulers have restarted.
+   1. Wait until queriers and rulers have restarted and are ready.
 
 1. Undo the doubling of series limits done in the first step.
 
