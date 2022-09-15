@@ -85,7 +85,7 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-   In this step zone awareness is enabled with the default zone. In this step new StatefulSets are created for zone aware alertmanagers, but no new pods are started.
+   In this step zone awareness is enabled with the default zone and new StatefulSets are created for zone aware alertmanagers, but no new pods are started.
 
 1. Wait until all alertmanagers are restarted and are ready.
 
