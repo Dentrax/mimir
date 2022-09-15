@@ -219,16 +219,16 @@ store_gateway:
     enabled: false
 ```
 
-> **Note**: The number of store gateway pods that will be started is derived from `store_gateway.replicas`. Each zone will start `store_gateway.replicas / number of zones` pods, rounded up to the nearest integer value. For example if you have 3 zones, then `store_gateway.replicas=3` will yield 1 store gateway per zone, but `store_gateway.replicas=4` will yield 2 per zone, 6 in total.
+> **Note**: The number of store-gateway pods that will be started is derived from `store_gateway.replicas`. Each zone will start `store_gateway.replicas / number of zones` pods, rounded up to the nearest integer value. For example if you have 3 zones, then `store_gateway.replicas=3` will yield 1 store-gateway per zone, but `store_gateway.replicas=4` will yield 2 per zone, 6 in total.
 
-### Decide which migration path to take for store gateways
+### Decide which migration path to take for store-gateways
 
 There are two ways to do the migration:
 
-1. With downtime. In this [procedure](#migrate-store-gateways-with-downtime) ingress is stopped to the cluster while store gateways are migrated. This is the quicker and simpler way.
-1. Without downtime. This is a multi step [procedure](#migrate-store-gateways-without-downtime) which requires additional hardware resources as the old and new store gateways run in parallel for some time.
+1. With downtime. In this [procedure](#migrate-store-gateways-with-downtime) ingress is stopped to the cluster while store-gateways are migrated. This is the quicker and simpler way.
+1. Without downtime. This is a multi step [procedure](#migrate-store-gateways-without-downtime) which requires additional hardware resources as the old and new store-gateways run in parallel for some time.
 
-### Migrate store gateways with downtime
+### Migrate store-gateways with downtime
 
 1. Create a new empty YAML file called `migrate.yaml`.
 
@@ -251,7 +251,7 @@ There are two ways to do the migration:
 
 1. Wait until there is no nginx or gateway running.
 
-1. Scale the current store gateways to 0.
+1. Scale the current store-gateways to 0.
 
    Replace the contents of the `migrate.yaml` file with:
 
@@ -271,9 +271,9 @@ There are two ways to do the migration:
 
 1. Wait until no store-gateways are running.
 
-1. Start the new zone aware store gateways.
+1. Start the new zone aware store-gateways.
 
-   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for store gateways](#configure-zone-aware-replication-for-store-gateways)
+   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for store-gateways](#configure-zone-aware-replication-for-store-gateways)
 
    Replace the contents of the `migrate.yaml` file with:
 
@@ -293,7 +293,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait until all requested store gateways are running.
+1. Wait until all requested store-gateways are running.
 
 1. Enable traffic to the installation.
 
@@ -312,11 +312,11 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
-### Migrate store gateways without downtime
+### Migrate store-gateways without downtime
 
 1. Create a new empty YAML file called `migrate.yaml`.
 
-1. Create the new zone aware store gateways
+1. Create the new zone aware store-gateways
 
    Copy the following into the `migrate.yaml` file:
 
@@ -335,13 +335,13 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait for all new store gateways to start up.
+1. Wait for all new store-gateways to start up.
 
-1. Wait for store gateways to sync all blocks.
+1. Wait for store-gateways to sync all blocks.
 
-   The logs of the new store gateways should contain the line "successfully synchronized TSDB blocks for all users".
+   The logs of the new store-gateways should contain the line "successfully synchronized TSDB blocks for all users".
 
-1. Make the read path use the new zone aware store gateways.
+1. Make the read path use the new zone aware store-gateways.
 
    Replace the contents of the `migrate.yaml` file with:
 
@@ -363,7 +363,7 @@ There are two ways to do the migration:
 
 1. Wait for the `helm` command to finish.
 
-1. Scale down non zone aware store gateways to 0.
+1. Scale down non zone aware store-gateways to 0.
 
    Replace the contents of the `migrate.yaml` file with:
 
@@ -384,7 +384,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait for non zone aware store gateways to stop.
+1. Wait for non zone aware store-gateways to stop.
 
 1. Set the final configuration.
 
