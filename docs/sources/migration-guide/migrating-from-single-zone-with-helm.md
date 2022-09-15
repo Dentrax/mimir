@@ -225,46 +225,22 @@ store_gateway:
 
 There are two ways to do the migration:
 
-1. With downtime. In this [procedure](#migrate-store-gateways-with-downtime) ingress is stopped to the cluster while store-gateways are migrated. This is the quicker and simpler way.
+1. With downtime. In this [procedure](#migrate-store-gateways-with-downtime) old non zone aware store-gateways are stopped, which will cause queries that look back more than 12 hours (or whatever `querier.query_store_after` Mimir parameter is set to) to fail. Ingress is not impacted. This is the quicker and simpler way.
 1. Without downtime. This is a multi step [procedure](#migrate-store-gateways-without-downtime) which requires additional hardware resources as the old and new store-gateways run in parallel for some time.
 
 ### Migrate store-gateways with downtime
 
 1. Create a new empty YAML file called `migrate.yaml`.
 
-1. Turn off traffic to the installation.
+1. Scale the current store-gateways to 0.
 
    Copy the following into the `migrate.yaml` file:
 
    ```yaml
    store_gateway:
-     zoneAwareReplication:
-       enabled: false
-
-   nginx:
-     replicas: 0
-   gateway:
-     replicas: 0
-   ```
-
-1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
-
-1. Wait until there is no nginx or gateway running.
-
-1. Scale the current store-gateways to 0.
-
-   Replace the contents of the `migrate.yaml` file with:
-
-   ```yaml
-   store_gateway:
      replicas: 0
      zoneAwareReplication:
        enabled: false
-
-   nginx:
-     replicas: 0
-   gateway:
-     replicas: 0
    ```
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
@@ -282,11 +258,6 @@ There are two ways to do the migration:
      zoneAwareReplication:
        enabled: true
 
-   nginx:
-     replicas: 0
-   gateway:
-     replicas: 0
-
    rollout_operator:
      enabled: true
    ```
@@ -295,9 +266,9 @@ There are two ways to do the migration:
 
 1. Wait until all requested store-gateways are running.
 
-1. Enable traffic to the installation.
+1. Set the final configuration.
 
-   **Merge** the following values into your regular `custom.yaml` file:
+   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
 
    ```yaml
    store_gateway:
@@ -308,9 +279,34 @@ There are two ways to do the migration:
      enabled: true
    ```
 
-   > **Note**: these values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+   These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
-1. Upgrade the installation with the `helm` command using only your regular command line flags.
+   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
+
+   ```yaml
+   store_gateway:
+     sharding_ring:
+       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
+       kvstore:
+         prefix: multi-zone/
+       {{- end }}
+       tokens_file_path: /data/tokens
+       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
+       zone_awareness_enabled: true
+       {{- end }}
+   ```
+
+   If in doubt, set the following values:
+
+   ```yaml
+   mimir:
+     structuredConfig:
+       store_gateway:
+         sharding_ring:
+           kvstore:
+             prefix: multi-zone/
+           zone_awareness_enabled: true
+   ```
 
 ### Migrate store-gateways without downtime
 
