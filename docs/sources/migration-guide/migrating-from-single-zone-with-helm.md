@@ -38,7 +38,6 @@ There are two use cases in general:
    ```yaml
    alertmanager:
      zoneAwareReplication:
-       enabled: false # Do not turn on zone awareness without migration because of potential query errors
        topologyKey: "kubernetes.io/hostname" # Triggers creating anti-affinity rules
    ```
 
@@ -46,7 +45,6 @@ There are two use cases in general:
    ```yaml
    alertmanager:
      zoneAwareReplication:
-       enabled: false # Do not turn on zone awareness without migration because of potential query errors
        topologyKey: "kubernetes.io/hostname" # Triggers creating anti-affinity rules
        zones:
          - name: zone-a
@@ -449,7 +447,7 @@ There are two use cases in general:
    ```yaml
    ingester:
      zoneAwareReplication:
-       enabled: false # Do not turn on zone awareness without migration because of potential query errors
+       enabled: false # Do not turn on zone awareness without migration because of potential data loss
        topologyKey: "kubernetes.io/hostname" # Triggers creating anti-affinity rules
    ```
 
@@ -457,7 +455,7 @@ There are two use cases in general:
    ```yaml
    ingester:
      zoneAwareReplication:
-       enabled: false # Do not turn on zone awareness without migration because of potential query errors
+       enabled: false # Do not turn on zone awareness without migration because of potential data loss
        topologyKey: "kubernetes.io/hostname" # For multi node anti-affinity rules
        zones:
          - name: zone-a
