@@ -27,9 +27,7 @@ Using zone aware replication for alertmanager is optional and is only available 
 
 ### Configure zone aware replication for alertmanagers
 
-This section is about planning and configuring the availability zones defined in the array value `alertmanager.zoneAwareReplication.zones`.
-
-> **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
+This section is about planning and configuring the availability zones defined under the `alertmanager.zoneAwareReplication` Helm value.
 
 There are two use cases in general:
 
@@ -57,6 +55,8 @@ There are two use cases in general:
            nodeSelector:
              topology.kubernetes.io/zone: zone-c
    ```
+
+> **Note**: as the `zones` value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
 
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
@@ -149,36 +149,13 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
    [//]: # "alertmanager-step4"
 
-   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
-
-   ```yaml
-   alertmanager:
-     ...
-     {{- if .Values.alertmanager.zoneAwareReplication.enabled }}
-     sharding_ring:
-       zone_awareness_enabled: true
-     {{- end }}
-   ```
-
-   If in doubt, set the following values:
-
-   ```yaml
-   mimir:
-     structuredConfig:
-       alertmanager:
-         sharding_ring:
-           zone_awareness_enabled: true
-   ```
-
 1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
 ## Migrate store-gateways to zone aware replication
 
 ### Configure zone aware replication for store-gateways
 
-This section is about planning and configuring the availability zones defined in the array value `store_gateway.zoneAwareReplication.zones`.
-
-> **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
+This section is about planning and configuring the availability zones defined under the `store_gateway.zoneAwareReplication` Helm value.
 
 There are two use cases in general:
 
@@ -209,15 +186,9 @@ There are two use cases in general:
              topology.kubernetes.io/zone: zone-c
    ```
 
+> **Note**: as `zones` value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
+
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
-
-> **Note**: Do not turn on zone awareness without migration because of potential query errors, make sure that `store_gateway.zoneAwareReplication.enabled` is set to false.
-
-```yaml
-store_gateway:
-  zoneAwareReplication:
-    enabled: false
-```
 
 > **Note**: The number of store-gateway pods that will be started is derived from `store_gateway.replicas`. Each zone will start `store_gateway.replicas / number of zones` pods, rounded up to the nearest integer value. For example if you have 3 zones, then `store_gateway.replicas=3` will yield 1 store-gateway per zone, but `store_gateway.replicas=4` will yield 2 per zone, 6 in total.
 
@@ -245,26 +216,7 @@ There are two ways to do the migration:
 
 1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
 
-1. Wait until no store-gateways are running.
-
-1. Start the new zone aware store-gateways.
-
-   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for store-gateways](#configure-zone-aware-replication-for-store-gateways)
-
-   Replace the contents of the `migrate.yaml` file with:
-
-   ```yaml
-   store_gateway:
-     zoneAwareReplication:
-       enabled: true
-
-   rollout_operator:
-     enabled: true
-   ```
-
-1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
-
-1. Wait until all requested store-gateways are running and are ready.
+1. Wait until all store-gateways have terminated.
 
 1. Set the final configuration.
 
@@ -281,32 +233,7 @@ There are two ways to do the migration:
 
    These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
-   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
-
-   ```yaml
-   store_gateway:
-     sharding_ring:
-       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
-       kvstore:
-         prefix: multi-zone/
-       {{- end }}
-       tokens_file_path: /data/tokens
-       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
-       zone_awareness_enabled: true
-       {{- end }}
-   ```
-
-   If in doubt, set the following values:
-
-   ```yaml
-   mimir:
-     structuredConfig:
-       store_gateway:
-         sharding_ring:
-           kvstore:
-             prefix: multi-zone/
-           zone_awareness_enabled: true
-   ```
+1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
 ### Migrate store-gateways without downtime
 
@@ -389,42 +316,13 @@ There are two ways to do the migration:
 
    These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
-   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
-
-   ```yaml
-   store_gateway:
-     sharding_ring:
-       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
-       kvstore:
-         prefix: multi-zone/
-       {{- end }}
-       tokens_file_path: /data/tokens
-       {{- if .Values.store_gateway.zoneAwareReplication.enabled }}
-       zone_awareness_enabled: true
-       {{- end }}
-   ```
-
-   If in doubt, set the following values:
-
-   ```yaml
-   mimir:
-     structuredConfig:
-       store_gateway:
-         sharding_ring:
-           kvstore:
-             prefix: multi-zone/
-           zone_awareness_enabled: true
-   ```
-
 1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
 ## Migrate ingesters to zone aware replication
 
 ### Configure zone aware replication for ingesters
 
-This section is about planning and configuring the availability zones defined in the array value `ingester.zoneAwareReplication.zones`.
-
-> **Note**: as this value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
+This section is about planning and configuring the availability zones defined under the `ingester.zoneAwareReplication` Helm value.
 
 There are two use cases in general:
 
@@ -442,7 +340,7 @@ There are two use cases in general:
    ingester:
      zoneAwareReplication:
        enabled: false # Do not turn on zone awareness without migration because of potential data loss
-       topologyKey: "kubernetes.io/hostname" # For multi node anti-affinity rules
+       topologyKey: "kubernetes.io/hostname" # Triggers creating anti-affinity rules
        zones:
          - name: zone-a
            nodeSelector:
@@ -455,15 +353,9 @@ There are two use cases in general:
              topology.kubernetes.io/zone: zone-c
    ```
 
+> **Note**: as `zones` value is an array, you must copy and modify it to make changes to it, there is no way to overwrite just parts of the array!
+
 Set the chosen configuration in your custom values (e.g. `custom.yaml`).
-
-> **Note**: Do not turn on zone awareness without migration because of data loss, make sure that `ingester.zoneAwareReplication.enabled` is set to false.
-
-```yaml
-ingester:
-  zoneAwareReplication:
-    enabled: false
-```
 
 > **Note**: The number of ingester pods that will be started is derived from `ingester.replicas`. Each zone will start `ingester.replicas / number of zones` pods, rounded up to the nearest integer value. For example if you have 3 zones, then `ingester.replicas=3` will yield 1 ingester per zone, but `ingester.replicas=4` will yield 2 per zone, 6 in total.
 
@@ -836,28 +728,6 @@ There are two ways to do the migration:
 
    These values are actually the default, which means that removing the values `ingester.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
 
-   > **Note**: if you have copied the `mimir.config` value for customizations, make sure to merge the latest version from the chart. That value should include this snippet:
-
-   ```yaml
-   ingester:
-      ring:
-        ...
-        unregister_on_shutdown: false
-        {{- if .Values.ingester.zoneAwareReplication.enabled }}
-        zone_awareness_enabled: true
-        {{- end }}
-   ```
-
-   If in doubt, set the following value:
-
-   ```yaml
-   mimir:
-     structuredConfig:
-       ingester:
-         ring:
-           zone_awareness_enabled: true
-   ```
-
 1. Wait at least 3 hours.
 
    The 3 hours is calculated from `blocks_storage.tsdb.block_ranges_period` + `blocks_storage.tsdb.head_compaction_idle_timeout` Grafana Mimir parameters to give enough time for ingesters to remove stale series from memory. Stale series will be there due to series being moved between ingesters.
@@ -879,7 +749,7 @@ There are two ways to do the migration:
           "querier.shuffle-sharding-ingesters-enabled": "false"
       ```
 
-   1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+   1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
    1. Wait until queriers and rulers have restarted and are ready.
 
