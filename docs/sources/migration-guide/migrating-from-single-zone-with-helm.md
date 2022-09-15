@@ -488,7 +488,7 @@ ingester:
 There are two ways to do the migration:
 
 1. With downtime. In this [procedure](#migrate-ingesters-with-downtime) ingress is stopped to the cluster while ingesters are migrated. This is the quicker and simpler way.
-1. Without downtime. This is a multi step [procedure](#migrate-ingesters-without-downtime) which requires additional hardware resources as the old and new ingesters run in parallel for some time. This is a complex migration that can take days.
+1. Without downtime. This is a multi step [procedure](#migrate-ingesters-without-downtime) which requires additional hardware resources as the old and new ingesters run in parallel for some time. This is a complex migration that can take days and requires monitoring for increased resouce utilization.
 
 ### Migrate ingesters with downtime
 
@@ -695,7 +695,26 @@ There are two ways to do the migration:
 
    The 3 hours is calculated from `blocks_storage.tsdb.block_ranges_period` + `blocks_storage.tsdb.head_compaction_idle_timeout` Grafana Mimir parameters to give enough time for ingesters to remove stale series from memory. Stale series will be there due to series being moved between ingesters.
 
-1. If the current `<N>` above in `ingester.zoneAwareReplication.migration.replicas` is less than `ingester.replicas`, go back to step 8.
+1. If the current `<N>` above in `ingester.zoneAwareReplication.migration.replicas` is less than `ingester.replicas`, go back to step 6.
+
+1. If you are using [shuffle sharding]({{< relref "../operators-guide/configure/configuring-shuffle-sharding" >}}), it must be turned off on the read path at this point.
+
+   1. Update your configuration with these values and keep them until otherwise instructed.
+
+      ```yaml
+      querier:
+        extraArgs:
+          "querier.shuffle-sharding-ingesters-enabled": "false"
+      ruler:
+        extraArgs:
+          "querier.shuffle-sharding-ingesters-enabled": "false"
+      ```
+
+   1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+   1. Wait until queriers and rulers have restarted.
+
+   1. Monitor resource utilization of queriers and rulers and scale up if necessary. Turning off shuffle sharding may increase resource utilization.
 
 1. Enable zone awareness on the write path.
 
@@ -854,6 +873,31 @@ There are two ways to do the migration:
          ring:
            zone_awareness_enabled: true
    ```
+
+1. Wait at least 3 hours.
+
+   The 3 hours is calculated from `blocks_storage.tsdb.block_ranges_period` + `blocks_storage.tsdb.head_compaction_idle_timeout` Grafana Mimir parameters to give enough time for ingesters to remove stale series from memory. Stale series will be there due to series being moved between ingesters.
+
+1. If you are using [shuffle sharding]({{< relref "../operators-guide/configure/configuring-shuffle-sharding" >}}):
+
+   1. Wait an extra 12 hours.
+
+      The 12 hours is calculated from the `querier.query_store_after` Grafana Mimir parameter. After this time, no series are stored outside their dedicated shard, meaning that shuffle sharding on the read path can be safely enabled.
+
+   1. Remove these values from your configuration:
+
+      ```yaml
+      querier:
+        extraArgs:
+          "querier.shuffle-sharding-ingesters-enabled": "false"
+      ruler:
+        extraArgs:
+          "querier.shuffle-sharding-ingesters-enabled": "false"
+      ```
+
+   1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+
+   1. Wait until queriers and rulers have restarted.
 
 1. Undo the doubling of series limits done in the first step.
 
