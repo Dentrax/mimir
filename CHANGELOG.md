@@ -65,7 +65,7 @@
 * [ENHANCEMENT] Added basic authentication and bearer token support for when Mimir is behind a gateway authenticating the calls. #2717
 
 ### Documentation
-
+* [ENHANCEMENT] Added documentation on how to configure HA deduplication using Consul on Mimir Helm deployment. #2972
 
 ## 2.3.0-rc.0
 
