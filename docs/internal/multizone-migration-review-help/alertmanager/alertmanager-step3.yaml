@@ -1,10 +1,6 @@
 alertmanager:
   zoneAwareReplication:
     enabled: true
-    migration:
-      enabled: true
-      writePath: true
-      scaleDownDefaultZone: true
 
 rollout_operator:
   enabled: true

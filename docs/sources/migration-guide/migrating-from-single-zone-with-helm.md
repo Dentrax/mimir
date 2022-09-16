@@ -64,6 +64,8 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 ### Migrate alertmanager
 
+Before starting this procedure, set up your zones according to [Configure zone aware replication for alertmanagers](#configure-zone-aware-replication-for-alertmanagers).
+
 1. Create a new empty YAML file called `migrate.yaml`.
 
 1. Start the migration.
@@ -111,18 +113,14 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
 1. Wait until all new zone aware alertmanagers are started and are ready.
 
-1. Scale down old alertmanagers to 0.
+1. Set the final configuration.
 
-   Replace the contents of the `migrate.yaml` file with:
+   **Merge** the following values into your custom Helm values file:
 
    ```yaml
    alertmanager:
      zoneAwareReplication:
        enabled: true
-       migration:
-         enabled: true
-         writePath: true
-         scaleDownDefaultZone: true
 
    rollout_operator:
      enabled: true
@@ -130,26 +128,9 @@ Set the chosen configuration in your custom values (e.g. `custom.yaml`).
 
    [//]: # "alertmanager-step3"
 
-1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+1. Upgrade the installation with the `helm` command using your regular command line flags.
 
 1. Wait until old non zone aware alertmanagers are terminated.
-
-1. Set the final configuration.
-
-   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
-
-   ```yaml
-   alertmanager:
-     zoneAwareReplication:
-       enabled: true
-
-   rollout_operator:
-     enabled: true
-   ```
-
-   [//]: # "alertmanager-step4"
-
-1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
 ## Migrate store-gateways to zone aware replication
 
@@ -201,6 +182,8 @@ There are two ways to do the migration:
 
 ### Migrate store-gateways with downtime
 
+Before starting this procedure, set up your zones according to [Configure zone aware replication for store-gateways](#configure-zone-aware-replication-for-store-gateways).
+
 1. Create a new empty YAML file called `migrate.yaml`.
 
 1. Scale the current store-gateways to 0.
@@ -220,7 +203,7 @@ There are two ways to do the migration:
 
 1. Set the final configuration.
 
-   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
+   **Merge** the following values into your custom Helm values file:
 
    ```yaml
    store_gateway:
@@ -231,11 +214,15 @@ There are two ways to do the migration:
      enabled: true
    ```
 
-   These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+   These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` is also a valid step.
 
-1. Upgrade the installation with the `helm` command using only your regular command line flags.
+1. Upgrade the installation with the `helm` command using your regular command line flags.
+
+1. Wait until all store-gateways are running and ready.
 
 ### Migrate store-gateways without downtime
+
+Before starting this procedure, set up your zones according to [Configure zone aware replication for store-gateways](#configure-zone-aware-replication-for-store-gateways).
 
 1. Create a new empty YAML file called `migrate.yaml`.
 
@@ -282,9 +269,9 @@ There are two ways to do the migration:
 
 1. Wait for all queriers and rulers to restart and become ready.
 
-1. Delete the non zone aware store-gateways.
+1. Set the final configuration.
 
-   Replace the contents of the `migrate.yaml` file with:
+   **Merge** the following values into your custom Helm values file:
 
    ```yaml
    store_gateway:
@@ -297,26 +284,11 @@ There are two ways to do the migration:
 
    [//]: # "storegateway-step3"
 
-1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
+   These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` is also a valid step.
+
+1. Upgrade the installation with the `helm` command using your regular command line flags.
 
 1. Wait for non zone aware store-gateways to terminate.
-
-1. Set the final configuration.
-
-   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
-
-   ```yaml
-   store_gateway:
-     zoneAwareReplication:
-       enabled: true
-
-   rollout_operator:
-     enabled: true
-   ```
-
-   These values are actually the default, which means that removing the values `store_gateway.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
-
-1. Upgrade the installation with the `helm` command using only your regular command line flags.
 
 ## Migrate ingesters to zone aware replication
 
@@ -367,6 +339,8 @@ There are two ways to do the migration:
 1. Without downtime. This is a multi step [procedure](#migrate-ingesters-without-downtime) which requires additional hardware resources as the old and new ingesters run in parallel for some time. This is a complex migration that can take days and requires monitoring for increased resouce utilization.
 
 ### Migrate ingesters with downtime
+
+Before starting this procedure, set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters).
 
 1. Create a new empty YAML file called `migrate.yaml`.
 
@@ -449,8 +423,6 @@ There are two ways to do the migration:
 
 1. Start the new zone aware ingesters.
 
-   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters)
-
    Replace the contents of the `migrate.yaml` file with:
 
    ```yaml
@@ -473,7 +445,7 @@ There are two ways to do the migration:
 
 1. Enable traffic to the installation.
 
-   **Merge** the following values into your regular `custom.yaml` file:
+   **Merge** the following values into your custom Helm values file:
 
    ```yaml
    ingester:
@@ -484,11 +456,13 @@ There are two ways to do the migration:
      enabled: true
    ```
 
-   > **Note**: these values are actually the default, which means that removing the values `ingester.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+   These values are actually the default, which means that removing the values `ingester.zoneAwareReplication.enabled` and `rollout_operator.enabled` is also a valid step.
 
-1. Upgrade the installation with the `helm` command using only your regular command line flags.
+1. Upgrade the installation with the `helm` command using your regular command line flags.
 
 ### Migrate ingesters without downtime
+
+Before starting this procedure, set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters)
 
 1. Double the series limits for tenants and the ingesters.
 
@@ -520,8 +494,6 @@ There are two ways to do the migration:
 1. Create a new empty YAML file called `migrate.yaml`.
 
 1. Start the migration.
-
-   > **Note**: this step assumes that you set up your zones according to [Configure zone aware replication for ingesters](#configure-zone-aware-replication-for-ingesters)
 
    Copy the following into the `migrate.yaml` file:
 
@@ -696,7 +668,7 @@ There are two ways to do the migration:
 
 1. Delete the default zone.
 
-   Replace the contents of the `migrate.yaml` file with:
+   **Merge** the following values into your custom Helm values file:
 
    ```yaml
    ingester:
@@ -709,24 +681,9 @@ There are two ways to do the migration:
 
    [//]: # "ingester-step7"
 
-1. Upgrade the installation with the `helm` command and make sure to provide the flag `-f migrate.yaml` as the last flag.
-
-1. Wait until the `helm` command exits.
-
-1. Set the final configuration.
-
-   **Merge** the last values in `migrate.yaml` file into your regular `custom.yaml` file:
-
-   ```yaml
-   ingester:
-     zoneAwareReplication:
-       enabled: true
-
-   rollout_operator:
-     enabled: true
-   ```
-
    These values are actually the default, which means that removing the values `ingester.zoneAwareReplication.enabled` and `rollout_operator.enabled` from your `custom.yaml` is also a valid step.
+
+1. Upgrade the installation with the `helm` command using your regular command line flags.
 
 1. Wait at least 3 hours.
 
@@ -749,10 +706,10 @@ There are two ways to do the migration:
           "querier.shuffle-sharding-ingesters-enabled": "false"
       ```
 
-   1. Upgrade the installation with the `helm` command using only your regular command line flags.
+   1. Upgrade the installation with the `helm` command using your regular command line flags.
 
    1. Wait until queriers and rulers have restarted and are ready.
 
 1. Undo the doubling of series limits done in the first step.
 
-1. Upgrade the installation with the `helm` command using only your regular command line flags.
+1. Upgrade the installation with the `helm` command using your regular command line flags.

@@ -507,10 +507,8 @@ alertmanager:
     migration:
       # -- Indicate if migration is ongoing for multi zone alertmanager
       enabled: false
-      # -- Total number of replicas to start in availability zones when migration is enabled
-      replicas: 0
-      # -- Scale default zone alertmanagers to 0
-      scaleDownDefaultZone: false
+      # -- Start zone aware alertmanagers
+      writePath: false
     # -- Zone definitions for alertmanager zones
     zones:
     # -- Name of the zone, used in labels and selectors. Must follow Kubernetes naming restrictions: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/

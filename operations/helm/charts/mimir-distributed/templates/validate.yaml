@@ -212,7 +212,7 @@
 {{- end -}}
 
 {{- with $.Values.alertmanager.zoneAwareReplication.migration }}
-{{- $steps := list "enabled" "writePath" "scaleDownDefaultZone" }}
+{{- $steps := list "enabled" "writePath" }}
 {{- range $i, $item := rest $steps -}}
 {{- range $j, $mustHave := slice $steps 0 $i }}
 {{- with $.Values.alertmanager.zoneAwareReplication.migration }}
