@@ -14,14 +14,14 @@ weight: 130
 You can configure Grafana Mimir by using a YAML file or via command-line flags
 that represent configuration parameters.
 To specify the YAML file, use the `-config.file` command-line option.
-If you specify both the command-line flags and YAML configuration parameters, 
+If you specify both the command-line flags and YAML configuration parameters,
 the command-line flags take precedence over values in a YAML file.
 
 To see the current configuration of any component,
 go to the `/config` HTTP API endpoint.
 Passwords are filtered out of this endpoint.
 
-Parameters are 
+Parameters are
 written in [YAML format](https://en.wikipedia.org/wiki/YAML), and
 brackets indicate that a parameter is optional.
 
@@ -36,9 +36,9 @@ brackets indicate that a parameter is optional.
 - `<prefix>`: a CLI flag prefix based on the context (look at the parent configuration block to see which CLI flags prefix should be used)
 - `<relabel_config>`: a [Prometheus relabeling configuration](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config)
 - `<time>`: a timestamp, with available formats:
-    - `2006-01-20` (midnight, local timezone)
-    - `2006-01-20T15:04` (local timezone)
-    - RFC 3339 formats: `2006-01-20T15:04:05Z` (UTC) or `2006-01-20T15:04:05+07:00` (explicit timezone)
+  - `2006-01-20` (midnight, local timezone)
+  - `2006-01-20T15:04` (local timezone)
+  - RFC 3339 formats: `2006-01-20T15:04:05Z` (UTC) or `2006-01-20T15:04:05+07:00` (explicit timezone)
 
 ## Parameter categories
 
@@ -3610,7 +3610,7 @@ The gcs_backend block configures the connection to Google Cloud Storage object s
 
 # JSON either from a Google Developers Console client_credentials.json file, or
 # a Google Developers service account key. Needs to be valid JSON, not a
-# filesystem path. If empty, fallback to Google default logic: 
+# filesystem path. If empty, fallback to Google default logic:
 # 1. A JSON file whose path is specified by the GOOGLE_APPLICATION_CREDENTIALS
 # environment variable. For workload identity federation, refer to
 # https://cloud.google.com/iam/docs/how-to#using-workload-identity-federation on
