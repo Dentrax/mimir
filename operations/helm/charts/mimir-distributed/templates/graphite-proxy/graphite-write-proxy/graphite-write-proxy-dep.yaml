@@ -79,7 +79,7 @@ spec:
           resources:
             {{- toYaml .Values.graphite.write_proxy.resources | nindent 12 }}
           securityContext:
-              {{- toYaml .Values.graphite.write_proxy.containerSecurityContext | nindent 12 }}
+            {{- toYaml .Values.graphite.write_proxy.containerSecurityContext | nindent 12 }}
           env:
             {{- with .Values.global.extraEnv }}
               {{ toYaml . | nindent 12 }}
