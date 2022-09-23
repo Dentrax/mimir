@@ -96,6 +96,7 @@ metadata-cache:
 
 results-cache:
   enabled: true
+  replicas: 2
 
 minio:
   enabled: false
