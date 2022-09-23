@@ -16,7 +16,7 @@
 # The values in this file also add podAntiAffinity rules for ingesters and store-gateways.
 # The rules ensure that the replicas of the same component are not scheduled on the same
 # Kubernetes Node. Coming soon: guides for production Mimir and GEM setups, and for
-# configure zone-aware replication.
+# configuring zone-aware replication in Helm.
 #
 # MinIO is no longer enabled, and you are encouraged to use your cloud providers
 # object storage service such as S3 or GCS.
@@ -51,10 +51,10 @@ distributor:
   resources:
     limits:
       cpu: 3.5
-      memory: 7Gi
+      memory: 5.7Gi
     requests:
       cpu: 3.5
-      memory: 7Gi
+      memory: 5.7Gi
 
 ingester:
   persistentVolume:
@@ -146,23 +146,23 @@ ruler:
   replicas: 1
   resources:
     limits:
+      cpu: 1.4
       memory: 2.8Gi
     requests:
-      cpu: 1
-      memory: 2Gi
+      cpu: 1.4
+      memory: 2.8Gi
 
 store_gateway:
   persistentVolume:
     size: 10Gi
-  # One replica should be enough to handle the load. But in order to ensure zero-downtime rollouts/updates
-  # we need one more pod that can serve requests. Scale to 1 replica if downtime during rollouts is not a concern.
   replicas: 2
   resources:
     limits:
+      cpu: 1.4
       memory: 2.1Gi
     requests:
-      cpu: 1
-      memory: 1.5Gi
+      cpu: 1.4
+      memory: 2.1Gi
   topologySpreadConstraints: {}
   affinity:
     podAntiAffinity:
@@ -183,23 +183,33 @@ store_gateway:
                   - store-gateway
           topologyKey: 'kubernetes.io/hostname'
 
+nginx:
+  replicas: 1
+  resources:
+    limits:
+      cpu: 1.4
+      memory: 731Mi
+    requests:
+      cpu: 1.4
+      memory: 731Mi
+
 # Grafana Enterprise Metrics feature related
 admin_api:
   replicas: 1
   resources:
     limits:
       cpu: 200m
-      memory: 256Mi
+      memory: 128Mi
     requests:
       cpu: 200m
-      memory: 256Mi
+      memory: 128Mi
 
 gateway:
   replicas: 1
   resources:
     limits:
-      cpu: 1
-      memory: 512Mi
+      cpu: 1.4
+      memory: 731Mi
     requests:
-      cpu: 1
-      memory: 512Mi
+      cpu: 1.4
+      memory: 731Mi

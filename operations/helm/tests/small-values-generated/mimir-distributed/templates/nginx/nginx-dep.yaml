@@ -68,7 +68,11 @@ spec:
             - name: docker-entrypoint-d-override
               mountPath: /docker-entrypoint.d
           resources:
-            {}
+            limits:
+              memory: 731Mi
+            requests:
+              cpu: 1
+              memory: 512Mi
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname

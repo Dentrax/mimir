@@ -48,14 +48,14 @@ distributor:
   replicas: 2
   resources:
     limits:
-      memory: 7Gi
+      memory: 5.7Gi
     requests:
-      cpu: 2.5
-      memory: 5Gi
+      cpu: 2
+      memory: 4Gi
 
 ingester:
   persistentVolume:
-    size: 15Gi
+    size: 50Gi
   replicas: 3
   resources:
     limits:
@@ -147,9 +147,7 @@ ruler:
 store_gateway:
   persistentVolume:
     size: 10Gi
-  # One replica should be enough to handle the load. But in order to ensure zero-downtime rollouts/updates
-  # we need one more pod that can serve requests. Scale to 1 replica if downtime during rollouts is not a concern.
-  replicas: 2
+  replicas: 3
   resources:
     limits:
       memory: 2.1Gi
@@ -176,12 +174,21 @@ store_gateway:
                   - store-gateway
           topologyKey: 'kubernetes.io/hostname'
 
+nginx:
+  replicas: 1
+  resources:
+    limits:
+      memory: 731Mi
+    requests:
+      cpu: 1
+      memory: 512Mi
+
 # Grafana Enterprise Metrics feature related
 admin_api:
   replicas: 1
   resources:
     limits:
-      memory: 256Mi
+      memory: 128Mi
     requests:
       cpu: 100m
       memory: 64Mi
@@ -189,6 +196,8 @@ admin_api:
 gateway:
   replicas: 1
   resources:
+    limits:
+      memory: 731Mi
     requests:
       cpu: 1
       memory: 512Mi

@@ -72,10 +72,10 @@ spec:
             initialDelaySeconds: 45
           resources:
             limits:
-              memory: 7Gi
+              memory: 5.7Gi
             requests:
-              cpu: 2.5
-              memory: 5Gi
+              cpu: 2
+              memory: 4Gi
           securityContext:
             readOnlyRootFilesystem: true
           env:
