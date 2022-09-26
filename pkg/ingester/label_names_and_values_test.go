@@ -8,16 +8,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/grafana/dskit/services"
+	"github.com/grafana/dskit/test"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/tsdb"
 	"github.com/prometheus/prometheus/tsdb/index"
 	"github.com/stretchr/testify/require"
+	"github.com/weaveworks/common/user"
 
 	"github.com/grafana/mimir/pkg/ingester/client"
+	"github.com/grafana/mimir/pkg/mimirpb"
 )
 
 // Scenario: each label name or label value is 8 bytes value. Except `label-c` label, its label name is 7 bytes in length.
@@ -145,76 +150,31 @@ func TestLabelValues_CardinalityReportSentInBatches(t *testing.T) {
 
 	require.Len(t, mockServer.SentResponses, 4)
 
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-a",
-			LabelValueSeries: map[string]uint64{
-				"a0000000": 100,
-				"a1111111": 100,
-				"a2222222": 100,
-			},
-		},
-		{
-			LabelName: "lbl-b",
-			LabelValueSeries: map[string]uint64{
-				"b0000000": 100,
-			},
-		},
-	}, mockServer.SentResponses[0].Items)
+	// Since responses order is non-deterministic, let's merge them into a single map and compare.
+	mergedResponses := make(map[string]map[string]uint64)
 
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-b",
-			LabelValueSeries: map[string]uint64{
-				"b1111111": 100,
-				"b2222222": 100,
-				"b3333333": 100,
-			},
-		},
-		{
-			LabelName: "lbl-c",
-			LabelValueSeries: map[string]uint64{
-				"c0000000": 100,
-			},
-		},
-	}, mockServer.SentResponses[1].Items)
+	for _, resp := range mockServer.SentResponses {
+		for _, item := range resp.Items {
+			c, ok := mergedResponses[item.LabelName]
+			if !ok {
+				c = make(map[string]uint64)
+				mergedResponses[item.LabelName] = c
+			}
+			for val, count := range item.LabelValueSeries {
+				c[val] = count
+			}
+		}
+	}
 
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-d",
-			LabelValueSeries: map[string]uint64{
-				"d0000000": 100,
-			},
-		},
-		{
-			LabelName: "lbl-e",
-			LabelValueSeries: map[string]uint64{
-				"e0000000": 100,
-			},
-		},
-		{
-			LabelName: "lbl-f",
-			LabelValueSeries: map[string]uint64{
-				"f0000000": 100,
-				"f1111111": 100,
-			},
-		},
-	}, mockServer.SentResponses[2].Items)
-
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-f",
-			LabelValueSeries: map[string]uint64{
-				"f2222222": 100,
-			},
-		},
-		{
-			LabelName: "lbl-g",
-			LabelValueSeries: map[string]uint64{
-				"g0000000": 100,
-			},
-		},
-	}, mockServer.SentResponses[3].Items)
+	require.Equal(t, map[string]map[string]uint64{
+		"lbl-a": {"a0000000": 100, "a1111111": 100, "a2222222": 100},
+		"lbl-b": {"b0000000": 100, "b1111111": 100, "b2222222": 100, "b3333333": 100},
+		"lbl-c": {"c0000000": 100},
+		"lbl-d": {"d0000000": 100},
+		"lbl-e": {"e0000000": 100},
+		"lbl-f": {"f0000000": 100, "f1111111": 100, "f2222222": 100},
+		"lbl-g": {"g0000000": 100},
+	}, mergedResponses)
 }
 
 func TestLabelValues_ExpectedAllValuesToBeReturnedInSingleMessage(t *testing.T) {
@@ -385,6 +345,118 @@ func TestLabelValuesCardinality_ContextCancellation(t *testing.T) {
 	}
 }
 
+func BenchmarkLabelValuesCardinality(b *testing.B) {
+	const (
+		userID     = "test"
+		numSeries  = 10000
+		metricName = "metric_name"
+	)
+
+	cfg := defaultIngesterTestConfig(b)
+	limits := defaultLimitsTestConfig()
+	limits.MaxGlobalSeriesPerMetric = 0
+	limits.MaxGlobalSeriesPerUser = 0
+
+	// Create ingester.
+	i, err := prepareIngesterWithBlocksStorageAndLimits(b, cfg, limits, "", nil)
+	require.NoError(b, err)
+	require.NoError(b, services.StartAndAwaitRunning(context.Background(), i))
+	b.Cleanup(func() {
+		require.NoError(b, services.StopAndAwaitTerminated(context.Background(), i))
+	})
+
+	// Wait until it's healthy.
+	test.Poll(b, 1*time.Second, 1, func() interface{} {
+		return i.lifecycler.HealthyInstancesCount()
+	})
+
+	// Push series to a compacted block.
+	ctx := user.InjectOrgID(context.Background(), userID)
+
+	samples := []mimirpb.Sample{{TimestampMs: 1_000, Value: 1}}
+	for s := 0; s < numSeries; s++ {
+		_, err = i.Push(ctx, writeRequestSingleSeries(labels.Labels{
+			{Name: labels.MetricName, Value: metricName},
+			{Name: "l", Value: strconv.Itoa(s)},
+			{Name: "mod_10", Value: strconv.Itoa(s % 10)},
+			{Name: "mod_100", Value: strconv.Itoa(s % 10)},
+		}, samples))
+		require.NoError(b, err)
+	}
+
+	i.Flush()
+
+	userTSDB := i.getTSDB(userID)
+	ir, err := userTSDB.Head().Index()
+	require.NoError(b, err)
+
+	mockServer := &mockLabelValuesCardinalityServer{context: context.Background()}
+
+	for _, bc := range []struct {
+		name       string
+		labelNames []string
+		matchers   []*labels.Matcher
+	}{
+		{
+			name:       "no matchers, __name__ label with 1 value all series",
+			labelNames: []string{labels.MetricName},
+			matchers:   nil,
+		},
+		{
+			name:       "no matchers, l label with 10k values, 1 series each",
+			labelNames: []string{"l"},
+			matchers:   nil,
+		},
+		{
+			name:       "no matchers, mod_10 label with 1k values, 10 series each",
+			labelNames: []string{"mod_10"},
+			matchers:   nil,
+		},
+		{
+			name:       "no matchers, mod_100 label with 100 values, 100 series each",
+			labelNames: []string{"mod_100"},
+			matchers:   nil,
+		},
+		{
+			name:       "__name__ matcher, l label with 10k values, 1 series each",
+			labelNames: []string{"l"},
+			matchers:   []*labels.Matcher{labels.MustNewMatcher(labels.MatchEqual, labels.MetricName, metricName)},
+		},
+		{
+			name:       "__name__ matcher, mod_10 label with 1k values, 10 series each",
+			labelNames: []string{"mod_10"},
+			matchers:   []*labels.Matcher{labels.MustNewMatcher(labels.MatchEqual, labels.MetricName, metricName)},
+		},
+		{
+			name:       "__name__ matcher, mod_100 label with 100 values, 100 series each",
+			labelNames: []string{"mod_100"},
+			matchers:   []*labels.Matcher{labels.MustNewMatcher(labels.MatchEqual, labels.MetricName, metricName)},
+		},
+		{
+			name:       "__name__ and mod_10 matchers, mod_100 label with 100 values, 100 series each",
+			labelNames: []string{labels.MetricName, "mod_100"},
+			matchers: []*labels.Matcher{
+				labels.MustNewMatcher(labels.MatchEqual, labels.MetricName, metricName),
+				labels.MustNewMatcher(labels.MatchEqual, "mod_10", "0"),
+			},
+		},
+	} {
+		b.Run(bc.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				err := labelValuesCardinality(
+					bc.labelNames,
+					bc.matchers,
+					ir,
+					tsdb.PostingsForMatchers,
+					1*1024*1024, // 1MB
+					mockServer,
+				)
+				require.NoError(b, err)
+			}
+		})
+	}
+}
+
 type mockPostings struct {
 	index.Postings
 	n int
@@ -397,6 +469,7 @@ func (m *mockPostings) Next() bool {
 	m.n--
 	return true
 }
+
 func (m *mockPostings) Err() error { return nil }
 
 type mockIndex struct {
