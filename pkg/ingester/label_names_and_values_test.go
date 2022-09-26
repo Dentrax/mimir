@@ -145,76 +145,31 @@ func TestLabelValues_CardinalityReportSentInBatches(t *testing.T) {
 
 	require.Len(t, mockServer.SentResponses, 4)
 
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-a",
-			LabelValueSeries: map[string]uint64{
-				"a0000000": 100,
-				"a1111111": 100,
-				"a2222222": 100,
-			},
-		},
-		{
-			LabelName: "lbl-b",
-			LabelValueSeries: map[string]uint64{
-				"b0000000": 100,
-			},
-		},
-	}, mockServer.SentResponses[0].Items)
+	// Since responses order is non-deterministic, let's merge them into a single map and compare.
+	mergedResponses := make(map[string]map[string]uint64)
 
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-b",
-			LabelValueSeries: map[string]uint64{
-				"b1111111": 100,
-				"b2222222": 100,
-				"b3333333": 100,
-			},
-		},
-		{
-			LabelName: "lbl-c",
-			LabelValueSeries: map[string]uint64{
-				"c0000000": 100,
-			},
-		},
-	}, mockServer.SentResponses[1].Items)
+	for _, resp := range mockServer.SentResponses {
+		for _, item := range resp.Items {
+			c, ok := mergedResponses[item.LabelName]
+			if !ok {
+				c = make(map[string]uint64)
+				mergedResponses[item.LabelName] = c
+			}
+			for val, count := range item.LabelValueSeries {
+				c[val] = count
+			}
+		}
+	}
 
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-d",
-			LabelValueSeries: map[string]uint64{
-				"d0000000": 100,
-			},
-		},
-		{
-			LabelName: "lbl-e",
-			LabelValueSeries: map[string]uint64{
-				"e0000000": 100,
-			},
-		},
-		{
-			LabelName: "lbl-f",
-			LabelValueSeries: map[string]uint64{
-				"f0000000": 100,
-				"f1111111": 100,
-			},
-		},
-	}, mockServer.SentResponses[2].Items)
-
-	require.Equal(t, []*client.LabelValueSeriesCount{
-		{
-			LabelName: "lbl-f",
-			LabelValueSeries: map[string]uint64{
-				"f2222222": 100,
-			},
-		},
-		{
-			LabelName: "lbl-g",
-			LabelValueSeries: map[string]uint64{
-				"g0000000": 100,
-			},
-		},
-	}, mockServer.SentResponses[3].Items)
+	require.Equal(t, map[string]map[string]uint64{
+		"lbl-a": {"a0000000": 100, "a1111111": 100, "a2222222": 100},
+		"lbl-b": {"b0000000": 100, "b1111111": 100, "b2222222": 100, "b3333333": 100},
+		"lbl-c": {"c0000000": 100},
+		"lbl-d": {"d0000000": 100},
+		"lbl-e": {"e0000000": 100},
+		"lbl-f": {"f0000000": 100, "f1111111": 100, "f2222222": 100},
+		"lbl-g": {"g0000000": 100},
+	}, mergedResponses)
 }
 
 func TestLabelValues_ExpectedAllValuesToBeReturnedInSingleMessage(t *testing.T) {
@@ -388,7 +343,7 @@ func TestLabelValuesCardinality_ContextCancellation(t *testing.T) {
 func BenchmarkLabelValuesCardinality(b *testing.B) {
 	// Index reader mock.
 	existingLabels := make(map[string][]string)
-	lbValues := make([]string, 0, 100)
+	lbValues := make([]string, 0, 1000)
 	for j := 0; j < 100; j++ {
 		lbValues = append(lbValues, fmt.Sprintf("val-%d", j))
 	}

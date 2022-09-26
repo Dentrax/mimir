@@ -4,6 +4,7 @@ package ingester
 
 import (
 	"context"
+	"sync"
 
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/tsdb"
@@ -13,6 +14,12 @@ import (
 )
 
 const checkContextErrorSeriesCount = 1000 // series count interval in which context cancellation must be checked.
+
+type labelValueCountResult struct {
+	val   string
+	count uint64
+	err   error
+}
 
 // labelNamesAndValues streams the messages with the labels and values of the labels matching the `matchers` param.
 // Messages are immediately sent as soon they reach message size threshold defined in `messageSizeThreshold` param.
@@ -104,10 +111,6 @@ func labelValuesCardinality(
 	resp := client.LabelValuesCardinalityResponse{}
 	respSize := 0
 
-	// We will use original matchers + one extra matcher for label value.
-	lblValMatchers := make([]*labels.Matcher, len(matchers)+1)
-	copy(lblValMatchers, matchers)
-
 	for _, lbName := range lbNames {
 		if err := ctx.Err(); err != nil {
 			return err
@@ -120,38 +123,47 @@ func labelValuesCardinality(
 		// For each value count total number of series storing the result into cardinality response item.
 		var respItem *client.LabelValueSeriesCount
 
-		for _, lbValue := range lbValues {
-			if err := ctx.Err(); err != nil {
-				return err
-			}
-			// Create label name response item entry.
-			if respItem == nil {
-				respItem = &client.LabelValueSeriesCount{
-					LabelName:        lbName,
-					LabelValueSeries: make(map[string]uint64),
+		resultCh := make(chan labelValueCountResult, len(lbValues))
+
+		go computeLabelValuesSeriesCount(ctx, lbName, lbValues, matchers, idxReader, postingsForMatchersFn, resultCh)
+
+		running := true
+		for running {
+			select {
+			case countRes, ok := <-resultCh:
+				if !ok {
+					// Cardinality computation is done.
+					running = false
+					break
 				}
-				resp.Items = append(resp.Items, respItem)
-			}
-			// Get total series count applying label matchers.
-			lblValMatchers[len(lblValMatchers)-1] = labels.MustNewMatcher(labels.MatchEqual, lbName, lbValue)
+				if countRes.err != nil {
+					return countRes.err
+				}
 
-			seriesCount, err := countLabelValueSeries(ctx, idxReader, postingsForMatchersFn, lblValMatchers)
-			if err != nil {
-				return err
-			}
-			respItem.LabelValueSeries[lbValue] = seriesCount
+				if respItem == nil {
+					respItem = &client.LabelValueSeriesCount{
+						LabelName:        lbName,
+						LabelValueSeries: make(map[string]uint64),
+					}
+					resp.Items = append(resp.Items, respItem)
+				}
+				respItem.LabelValueSeries[countRes.val] = countRes.count
 
-			respSize += len(lbValue)
-			if respSize < msgSizeThreshold {
-				continue
+				respSize += len(countRes.val)
+				if respSize < msgSizeThreshold {
+					continue
+				}
+				// Flush the response when reached message threshold.
+				if err := client.SendLabelValuesCardinalityResponse(srv, &resp); err != nil {
+					return err
+				}
+				resp.Items = resp.Items[:0]
+				respSize = 0
+				respItem = nil
+
+			case <-ctx.Done():
+				return ctx.Err()
 			}
-			// Flush the response when reached message threshold.
-			if err := client.SendLabelValuesCardinalityResponse(srv, &resp); err != nil {
-				return err
-			}
-			resp.Items = resp.Items[:0]
-			respSize = 0
-			respItem = nil
 		}
 	}
 	// Send response in case there are any pending items.
@@ -161,13 +173,53 @@ func labelValuesCardinality(
 	return nil
 }
 
-func countLabelValueSeries(
+func computeLabelValuesSeriesCount(
 	ctx context.Context,
+	lbName string,
+	lbValues []string,
+	matchers []*labels.Matcher,
 	idxReader tsdb.IndexReader,
 	postingsForMatchersFn func(tsdb.IndexPostingsReader, ...*labels.Matcher) (index.Postings, error),
-	lblValMatchers []*labels.Matcher,
+	countCh chan<- labelValueCountResult,
+) {
+	var wg sync.WaitGroup
+
+	for _, lbValue := range lbValues {
+		wg.Add(1)
+		go func(lbValue string) {
+			defer wg.Done()
+
+			count, err := countLabelValueSeries(ctx, lbName, lbValue, idxReader, postingsForMatchersFn, matchers)
+			if err != nil {
+				select {
+				case countCh <- labelValueCountResult{err: err}:
+				default:
+					break
+				}
+				return
+			}
+			countCh <- labelValueCountResult{val: lbValue, count: count}
+		}(lbValue)
+	}
+	wg.Wait()
+
+	close(countCh)
+}
+
+func countLabelValueSeries(
+	ctx context.Context,
+	lbName, lbValue string,
+	idxReader tsdb.IndexReader,
+	postingsForMatchersFn func(tsdb.IndexPostingsReader, ...*labels.Matcher) (index.Postings, error),
+	matchers []*labels.Matcher,
 ) (uint64, error) {
 	var count uint64
+
+	// We will use original matchers + one extra matcher for label value.
+	lblValMatchers := make([]*labels.Matcher, len(matchers)+1)
+	copy(lblValMatchers, matchers)
+
+	lblValMatchers[len(lblValMatchers)-1] = labels.MustNewMatcher(labels.MatchEqual, lbName, lbValue)
 
 	p, err := postingsForMatchersFn(idxReader, lblValMatchers...)
 	if err != nil {
