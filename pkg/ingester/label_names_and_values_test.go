@@ -341,19 +341,26 @@ func TestLabelValuesCardinality_ContextCancellation(t *testing.T) {
 }
 
 func BenchmarkLabelValuesCardinality(b *testing.B) {
+	const numLabelValues = 1_000
+
 	// Index reader mock.
 	existingLabels := make(map[string][]string)
-	lbValues := make([]string, 0, 1000)
-	for j := 0; j < 100; j++ {
+	lbValues := make([]string, 0, numLabelValues)
+	for j := 0; j < numLabelValues; j++ {
 		lbValues = append(lbValues, fmt.Sprintf("val-%d", j))
 	}
 	existingLabels["__name__"] = lbValues
 
-	idxReader := &mockIndex{existingLabels: existingLabels}
+	idxReader := &mockIndex{
+		existingLabels: existingLabels,
+	}
 
 	// Posting mock.
 	postingsForMatchersFn := func(reader tsdb.IndexPostingsReader, matcher ...*labels.Matcher) (index.Postings, error) {
-		return &mockPostings{n: 100}, nil
+		return &mockPostings{
+			n:       1_000,
+			opDelay: time.Nanosecond, // Simulate posting iteration latency.
+		}, nil
 	}
 
 	// Server mock.
@@ -376,10 +383,14 @@ func BenchmarkLabelValuesCardinality(b *testing.B) {
 
 type mockPostings struct {
 	index.Postings
-	n int
+	n       int
+	opDelay time.Duration
 }
 
 func (m *mockPostings) Next() bool {
+	if m.opDelay > 0 {
+		time.Sleep(m.opDelay)
+	}
 	if m.n == 0 {
 		return false
 	}
