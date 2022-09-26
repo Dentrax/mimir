@@ -385,6 +385,40 @@ func TestLabelValuesCardinality_ContextCancellation(t *testing.T) {
 	}
 }
 
+func BenchmarkLabelValuesCardinality(b *testing.B) {
+	// Index reader mock.
+	existingLabels := make(map[string][]string)
+	lbValues := make([]string, 0, 100)
+	for j := 0; j < 100; j++ {
+		lbValues = append(lbValues, fmt.Sprintf("val-%d", j))
+	}
+	existingLabels["__name__"] = lbValues
+
+	idxReader := &mockIndex{existingLabels: existingLabels}
+
+	// Posting mock.
+	postingsForMatchersFn := func(reader tsdb.IndexPostingsReader, matcher ...*labels.Matcher) (index.Postings, error) {
+		return &mockPostings{n: 100}, nil
+	}
+
+	// Server mock.
+	mockServer := &mockLabelValuesCardinalityServer{context: context.Background()}
+	var server client.Ingester_LabelValuesCardinalityServer = mockServer
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		err := labelValuesCardinality(
+			[]string{"__name__"},
+			nil,
+			idxReader,
+			postingsForMatchersFn,
+			1*1024*1024, // 1MB
+			server,
+		)
+		require.NoError(b, err)
+	}
+}
+
 type mockPostings struct {
 	index.Postings
 	n int
