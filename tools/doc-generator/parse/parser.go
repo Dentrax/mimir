@@ -498,7 +498,7 @@ func getFieldExample(fieldKey string, fieldType reflect.Type) *FieldExample {
 func getCustomFieldEntry(field reflect.StructField, fieldValue reflect.Value, flags map[uintptr]*flag.Flag) (*ConfigEntry, error) {
 	if field.Type == reflect.TypeOf(logging.Level{}) || field.Type == reflect.TypeOf(logging.Format{}) {
 		fieldFlag, err := getFieldFlag(field, fieldValue, flags)
-		if err != nil {
+		if err != nil || fieldFlag == nil {
 			return nil, err
 		}
 
@@ -515,7 +515,7 @@ func getCustomFieldEntry(field reflect.StructField, fieldValue reflect.Value, fl
 	}
 	if field.Type == reflect.TypeOf(flagext.URLValue{}) {
 		fieldFlag, err := getFieldFlag(field, fieldValue, flags)
-		if err != nil {
+		if err != nil || fieldFlag == nil {
 			return nil, err
 		}
 
@@ -532,7 +532,7 @@ func getCustomFieldEntry(field reflect.StructField, fieldValue reflect.Value, fl
 	}
 	if field.Type == reflect.TypeOf(flagext.Secret{}) {
 		fieldFlag, err := getFieldFlag(field, fieldValue, flags)
-		if err != nil {
+		if err != nil || fieldFlag == nil {
 			return nil, err
 		}
 
@@ -549,7 +549,7 @@ func getCustomFieldEntry(field reflect.StructField, fieldValue reflect.Value, fl
 	}
 	if field.Type == reflect.TypeOf(model.Duration(0)) {
 		fieldFlag, err := getFieldFlag(field, fieldValue, flags)
-		if err != nil {
+		if err != nil || fieldFlag == nil {
 			return nil, err
 		}
 
@@ -566,7 +566,7 @@ func getCustomFieldEntry(field reflect.StructField, fieldValue reflect.Value, fl
 	}
 	if field.Type == reflect.TypeOf(flagext.Time{}) {
 		fieldFlag, err := getFieldFlag(field, fieldValue, flags)
-		if err != nil {
+		if err != nil || fieldFlag == nil {
 			return nil, err
 		}
 
